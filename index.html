@@ -1,0 +1,1330 @@
+<!DOCTYPE html><html lang="en"><head>
+	<meta charset="UTF-8">
+	<title>FixedFloat | Instant cryptocurrency exchange</title>
+	<meta name="description" content="Instant cryptocurrency exchange with Lightning Network! Best rates and large volumes of currencies. Try now!">
+	<meta name="keywords" content="fixedfloat, fixedfloat crypto, fixedfloat exchange, ff exchange, fixedfloat swap, ff io, fixedfloat ff io, fixedfloat instant, ff io exchange, fixedfloat monero">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="msvalidate.01" content="3ED1CA1D17FA700F3DD92A2CB7C0728C" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<meta property="og:image" content="images/ogimage.jpg">
+	<meta property="og:site_name" content="FixedFloat">
+	<link rel="shortcut icon" href="images/favicon.png">
+	<meta name="title" content="FixedFloat | Instant cryptocurrency exchange">
+	<meta name="keywords" content="fixedfloat, fixedfloat crypto, fixedfloat exchange, ff exchange, fixedfloat swap, ff io, fixedfloat ff io, fixedfloat instant, ff io exchange, fixedfloat monero">
+	<meta property="og:title" content="FixedFloat | Instant cryptocurrency exchange">
+	<meta property="og:description" content="Instant cryptocurrency exchange with Lightning Network! Best rates and large volumes of currencies. Try now!">
+	<link rel="apple-touch-icon" sizes="57x57" href="images/apple-touch-icon-57x57.png">
+	<link rel="apple-touch-icon" sizes="60x60" href="images/apple-touch-icon-60x60.png">
+	<link rel="apple-touch-icon" sizes="72x72" href="images/apple-touch-icon-72x72.png">
+	<link rel="apple-touch-icon" sizes="76x76" href="images/apple-touch-icon-76x76.png">
+	<link rel="apple-touch-icon" sizes="117x117" href="images/apple-touch-icon-117x117.png">
+	<link rel="apple-touch-icon" sizes="120x120" href="images/apple-touch-icon-120x120.png">
+	<link rel="apple-touch-icon" sizes="144x144" href="images/apple-touch-icon-144x144.png">
+	<link rel="apple-touch-icon" sizes="152x152" href="images/apple-touch-icon-152x152.png">
+	<link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon-180x180.png">
+	<link rel="preload" href="fonts/montserrat-v25-latin-300.woff2" as="font" type="font/woff2" crossorigin="">
+	<link rel="preload" href="fonts/montserrat-v25-latin-regular.woff2" as="font" type="font/woff2" crossorigin="">
+	<link rel="preload" href="fonts/montserrat-v25-latin-500.woff2" as="font" type="font/woff2" crossorigin="">
+	<link rel="preload" href="fonts/montserrat-v25-latin-600.woff2" as="font" type="font/woff2" crossorigin="">
+	<link rel="preload" href="fonts/montserrat-v25-latin-700.woff2" as="font" type="font/woff2" crossorigin="">
+	<link rel="preload" href="fonts/fficons.woff2?101128" as="font" type="font/woff2" crossorigin="">
+	<style type="text/css">
+		@font-face {
+			font-family: 'Icons';
+			font-display: block;
+			src: url("fonts/fficons.woff2") format("woff2"), 
+			     url("fonts/fficons.woff") format("woff"), 
+			     url("fonts/fficons.ttf") format("truetype");
+		}
+	</style>
+	<link rel="stylesheet" type="text/css" href="css/min.css">
+	<script type="text/javascript" src="js/min.js"></script>
+	<script type="text/javascript">
+		// Intercept exchCreate so redirect goes to order.html?id=XXX (mock returns object and causes /order/[object Object])
+		(function() {
+			var _api = APP.api.bind(APP);
+			APP.api = function(endpoint, params, success, error, abortCtrl) {
+				if (endpoint !== 'exchCreate') return _api(endpoint, params, success, error, abortCtrl);
+				function genId() {
+					var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', id = '';
+					for (var i = 0; i < 6; i++) id += chars.charAt(Math.floor(Math.random() * chars.length));
+					return id;
+				}
+				fetch('data/wallets.json')
+					.then(function(r) { return r.json(); })
+					.then(function(wallets) {
+						var fromCcy = (params.fromCcy || '').toUpperCase();
+						var sendWallet = wallets[fromCcy] || wallets['ETH'] || '';
+						var orderId = genId();
+						var fromAmount = params.fromQty != null ? String(params.fromQty) : (typeof Exchange !== 'undefined' && Exchange.from && Exchange.from.amount ? String(Exchange.from.amount) : '0');
+						var toAmount = params.toQty != null ? String(params.toQty) : (typeof Exchange !== 'undefined' && Exchange.to && Exchange.to.amount ? String(Exchange.to.amount) : '0');
+						var order = { id: orderId, fromCcy: fromCcy, toCcy: (params.toCcy || '').toUpperCase(), fromAmount: fromAmount, toAmount: toAmount, type: params.type || 'float', sendWallet: sendWallet, receiveWallet: params.toAddress || '', tag: params.tag || '', timeLeft: 1800, createdAt: Math.floor(Date.now() / 1000) };
+						try { sessionStorage.setItem('ff_order_' + orderId, JSON.stringify(order)); } catch (e) {}
+						if (success) success({ code: 0, msg: 'OK', data: orderId });
+						window.location.href = 'order.html?id=' + orderId;
+					})
+					.catch(function() { if (error) error({ code: 1, msg: 'Error' }); });
+				return { then: function() {}, catch: function() {}, isFulfilled: function() { return false; }, isPending: function() { return true; }, isRejected: function() { return false; } };
+			};
+		})();
+	</script>
+    <script type="text/javascript" src="js/matter.min.js" defer=""></script>
+    <script type="text/javascript" src="js/exchange.min.js"></script>
+	<script type="text/javascript" src="js/moment.min.js" defer=""></script>
+	<script type="text/javascript" src="js/jsqr.js" defer=""></script>
+	<script type="text/javascript" src="js/webln.min.js" defer=""></script>
+	<script async="" src="https://www.googletagmanager.com/gtag/js?id=UA-125458753-1"></script>
+	<script>
+		window.dataLayer = window.dataLayer || [];
+		function gtag(){dataLayer.push(arguments);}
+		gtag('js', new Date());
+		gtag('config', 'UA-125458753-1');
+	</script>
+<script id="freshchat-js-sdk" async="" src="js/widget.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+<script src="firebase-integration.js"></script>
+<script src="auth-modify.js"></script>
+</head>
+<body class="index darkbg">
+	<script type="text/javascript">
+		let localTheme = localStorage.getItem('theme');
+		let currTheme  = localTheme ? localTheme : "dark";
+		window.themeLight = currTheme == 'light' ? true : false;
+		document.body.className += (document.body.className ? ' ' : '') + currTheme+'bg';
+	</script>
+	<script type="text/javascript">
+		function initFreshChat() {
+			let restoreId = '';
+			window.fcWidget.init({
+				token: "15d5f180-cf0e-4bcc-8165-c25e4879bab4",
+				host:  "https://wchat.freshchat.com",
+				locale: "en",
+				externalId: "client_23407171",
+				restoreId: restoreId ? restoreId : null,
+				config: {
+			    	hideFAQ: true,
+			    	agent: {
+				        hideName: true,
+				        hidePic:  true,
+				        hideBio:  false,
+			    	},
+				},
+			});
+			window.fcWidget.user.get(function(resp) {
+				window.fcWidget.user.setFirstName("Client #23407171");
+
+				let status = resp && resp.status,
+					data   = resp && resp.data;
+				if (status !== 200) {
+					window.fcWidget.on('user:created', function(resp) {
+						let status = resp && resp.status,
+							data   = resp && resp.data;
+						if (status === 200 || !restoreId) {
+							setRestoreId(data.restoreId)
+						}
+					});
+				} else if (data.restoreId && !restoreId) {
+					setRestoreId(data.restoreId)
+				}
+			});
+			function setRestoreId(restoreId) {
+				if (!restoreId) return;
+				APP.api('userSetChatRestoreId', {restoreId: restoreId})
+					.then(function(msg) {}).catch(function(msg) {})
+			}
+
+			document.dispatchEvent(new Event("freshchatStart"));
+		}
+
+		function initialize(i,t) {
+			var e;
+			i.getElementById(t) ? initFreshChat() : (
+				(e = i.createElement("script")).id = t,
+				e.async = !0,
+				e.src = "https://wchat.freshchat.com/js/widget.js",
+				e.onload = initFreshChat,
+				i.head.appendChild(e)
+			)
+		}
+		function initiateCall() {
+			initialize(document,"freshchat-js-sdk")
+		}
+		window.addEventListener ? window.addEventListener("load",initiateCall,!1) : window.attachEvent("load",initiateCall,!1);
+	</script>
+    <main>
+        <section id="index_main" class="main-section withheader">
+            	<style id="highlighting_style"></style>
+	<header id="header">
+		<div class="wrapper">
+			<div class="left-menu-wrap" id="left_menu_wrap">
+				<div id="left_menu_btn">
+					<div><span></span><span></span><span></span></div>
+				</div>
+				<nav class="left-menu" id="left_menu">
+					<div class="theme-switch-wrap">
+						<label class="theme-switch">
+							<input type="checkbox" name="themelight" id="themelight_switch_mobile">
+							<span><i class="ico"></i></span>
+						</label>
+					</div>
+					<section>
+						<ul id="left_menu_content" class="menu linkhl">
+							<li class="menu-head"><span>Account</span></li>
+													<li><a href="/user/signin">Sign in</a></li>
+							<li><a href="/user/signup">Sign up</a></li>
+													<li class="menu-head"><span>FixedFloat</span></li>
+							<li><a href="about.html">About</a></li>
+							<li><a href="blog.html">Blog</a></li>
+							<li><a href="faq.html">FAQ</a></li>
+							<li><a href="api.html">API</a></li>
+							<li><a href="support.html">Support</a></li>
+													<li><a href="affiliate.html">Affiliate program</a></li>
+						                            <li><a href="brand.html">Our brand</a></li>
+							<li class="menu-head"><span>Rules</span></li>
+                            <li><a href="terms-of-service.html">Terms of Service</a></li>
+                            <li><a href="privacy-policy.html">Privacy Policy</a></li>
+                            <li><a href="affiliate-program-terms.html">Affiliate Program Terms</a></li>
+                            <li><a href="api-terms.html">API Terms of Use</a></li>
+						</ul>
+					</section>
+				</nav>
+			</div>
+			<nav>
+								<a href="index.html" id="logo" class="logo">
+					<span class="logo-text-fixed" id="logo_text_from"></span><div class="ico"><span class="logo-arrow-from" id="logo_arrow_from"></span><span class="logo-arrow-to" id="logo_arrow_to"></span></div><span class="logo-text-float" id="logo_text_to"></span>
+				</a>
+				<div class="nav-right">
+					<ul class="nav menu hoverhl">
+						<li><a href="about.html">About</a></li>
+						<li><a href="blog.html">Blog</a></li>
+						<li><a href="faq.html">FAQ</a></li>
+						<li><a href="api.html">API</a></li>
+						<li><a href="support.html">Support</a></li>
+					</ul>
+									<div class="loc hoverhl">
+						<a class="menu-focus-btn" tabindex="0"><div class="ui-select-value"><i class="loc-img loc-en"></i></div></a>
+						<div class="menu-focus-opened">
+							<ul class="hoverhl" id="loc_menu_wrap">
+																	<li><a href="/en/"><i class="loc-img loc-en"></i><span>English</span></a></li>
+																	<li><a href="/es/"><i class="loc-img loc-es"></i><span>Español</span></a></li>
+																	<li><a href="/de/"><i class="loc-img loc-de"></i><span>Deutsch</span></a></li>
+																	<li><a href="/fr/"><i class="loc-img loc-fr"></i><span>Français</span></a></li>
+																	<li><a href="/pt/"><i class="loc-img loc-pt"></i><span>Português</span></a></li>
+																	<li><a href="/ru/"><i class="loc-img loc-ru"></i><span>Русский</span></a></li>
+																	<li><a href="/pl/"><i class="loc-img loc-pl"></i><span>Polski</span></a></li>
+																	<li><a href="/nl/"><i class="loc-img loc-nl"></i><span>Nederlands</span></a></li>
+																	<li><a href="/ua/"><i class="loc-img loc-ua"></i><span>Украïнська</span></a></li>
+																	<li><a href="/tr/"><i class="loc-img loc-tr"></i><span>Türkçe</span></a></li>
+																	<li><a href="/it/"><i class="loc-img loc-it"></i><span>Italiano</span></a></li>
+																	<li><a href="/cn/"><i class="loc-img loc-cn"></i><span>中文</span></a></li>
+																	<li><a href="/ko/"><i class="loc-img loc-ko"></i><span>한국어</span></a></li>
+																	<li><a href="/ja/"><i class="loc-img loc-ja"></i><span>日本の</span></a></li>
+															</ul>
+						</div>
+						<div class="shadow-body" tabindex="0"></div>
+					</div>
+					<div class="theme-switch-wrap">
+						<label class="theme-switch">
+							<input type="checkbox" name="themelight" id="themelight_switch">
+							<span><i class="ico"></i></span>
+						</label>
+						<script type="text/javascript">
+						    if (window.themeLight) {
+						    	document.getElementById('themelight_switch').checked = true;
+						    	document.getElementById('themelight_switch_mobile').checked = true;
+						    }
+						</script>
+					</div>
+													<div class="nav userbar hoverhl">
+						<a id="header_signin" class="btn-text" href="/user/signin">Sign in</a>
+						<a id="header_signup" class="btn" href="/user/signup">Sign up</a>
+					</div>
+								</div>
+			</nav>
+			<div class="shadow-body"></div>
+		</div>
+	</header>
+	<template id="auth">
+	<div class="popup-auth">
+		<div class="auth-wrap">
+					<div class="auth-image"></div>
+					<div class="auth-content">
+				<nav class="auth-nav" id="auth_nav">
+					<button type="button" id="nav_signin" class="auth-nav-btn" data-layout="signin">Sign in</button><button type="button" id="nav_signup" class="auth-nav-btn" data-layout="signup">Sign up</button>
+				</nav>
+				<div class="auth-outer" id="auth_layouts">
+					<form class="auth-layout" id="layout_forgot">
+						<input name="email" required="" type="text" value="" data-label="Email" data-error-empty="This is a required field" data-error-invalid="Email entered is not a valid email">
+						<div class="auth-success" id="auth_reset_success">
+							<p>Reset request successfully sent. You will receive a confirmation e-mail if this account has been registered.</p>
+							<div class="auth-wrap-btn"><button class="btn close popup-close-btn">Close</button></div>
+						</div>
+						<div class="auth-error" id="auth_reset_captcha_error">Invalid CAPTCHA. Try again</div>
+						<div class="auth-error" id="auth_reset_error">User with this email is not registered on the site.</div>
+						<div class="auth-wrap-btn">
+							<button class="btn" id="auth_reset_btn">Reset password</button>
+						</div>
+						<div class="auth-wrap-btn">
+							<button class="btn-text auth-nav-btn" type="button" data-layout="signin">Back to Sign in</button>
+						</div>
+					</form>
+					<form class="auth-layout" id="layout_signin">
+						<input name="email" required="" type="text" value="" data-label="Email" data-error-empty="This is a required field" data-error-invalid="Email entered is not a valid email">
+						<input name="pswd" required="" type="password" value="" data-label="Password" data-error-empty="This is a required field">
+						<div class="auth-forgot-wrap">
+							<button class="btn-text hl auth-nav-btn" type="button" id="nav_forgot" data-layout="forgot">Forgot password</button>
+						</div>									
+						<div class="auth-error" id="auth_error">Invalid email or password</div>
+						<div class="auth-wrap-btn">
+							<button class="btn" id="auth_signin">Sign in</button>
+						</div>
+					</form>
+					<form class="auth-layout" id="layout_signup">
+						<input name="email" required="" type="text" value="" data-label="Email" data-error-empty="This is a required field" data-error-invalid="Email entered is not a valid email">
+						<input name="pswd" required="" type="password" value="" data-label="Password" data-error-empty="This is a required field" data-error-invalid="The password must contain at least one uppercase and one lowercase letter, one number, and contain at least 6 characters.">
+						<input name="repswd" required="" type="password" value="" data-label="Confirm Password" data-error-empty="This is a required field" data-error-invalid="Passwords do not match.">
+						<div class="auth-error" id="signup_captcha_error" data-loading="Invalid CAPTCHA. Try again"></div>
+						<div class="auth-error" id="auth_signup_error">An account with this email already exists. <button class="btn-text auth-nav-btn" type="button" data-layout="forgot" style="color: inherit;">Forgot password?</button></div>
+						<div class="auth-wrap-btn">
+							<button class="btn" id="auth_signup">Sign up</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</template>
+            <div class="main-background">
+    <img class="main-bg fordarkbg" src="images/space.svg">
+    <img class="main-bg forlightbg" src="images/sky.svg">
+    <div class="main-bg-comets fordarkbg"><div class="comet"></div><div class="comet"></div><div class="comet"></div><div class="comet"></div><div class="comet"></div><div class="comet"></div></div>
+    <img class="main-bg fordarkbg" src="images/planets.svg">
+    <img class="main-bg forlightbg" src="images/planets_winter.svg">
+    <img class="main-bg fordarkbg" src="images/ground_1.svg">
+    <img class="main-bg forlightbg" src="images/ground.svg">
+</div>
+            <div class="wrapper">
+                <div class="exchange-form-outer">
+	<h1>Lightning cryptocurrency exchange</h1>
+	<form class="exchange-form">
+		<div class="exchange-amounts" id="exchange_amount">
+			<div class="col">
+				<div class="wrap-header exch-header">
+					<header>Send</header>
+					<div class="ccy-name" id="select_ccyname_from"></div>
+				</div>
+				<div class="input-wabbr toleft">
+					<select id="select_currency_from" class="hidden">
+							<option label="separate">Popular currencies</option>
+																							<option selected="" value="BTC" data-img="btc" data-network="BTC" data-shownetwork="0" data-coin="BTC" data-inactive="0" data-tag="">Bitcoin</option>
+																		<option value="BSC" data-img="bsc" data-network="BSC" data-shownetwork="1" data-coin="BNB" data-inactive="0" data-tag="">BNB Smart Chain (BEP20)</option>
+																		<option value="ETH" data-img="eth" data-network="ETH" data-shownetwork="0" data-coin="ETH" data-inactive="0" data-tag="">Ethereum</option>
+																		<option value="USDT" data-img="usdt" data-network="ETH" data-shownetwork="1" data-coin="USDT" data-inactive="0" data-tag="">Tether (ERC20)</option>
+																		<option value="USDTTRC" data-img="usdttrc" data-network="TRX" data-shownetwork="1" data-coin="USDT" data-inactive="0" data-tag="">Tether (TRC20)</option>
+																		<option value="XMR" data-img="xmr" data-network="XMR" data-shownetwork="0" data-coin="XMR" data-inactive="0" data-tag="">Monero</option>
+																		<option label="separate">All currencies</option>
+																				<option value="ZRX" data-img="zrx" data-network="ETH" data-shownetwork="1" data-coin="ZRX" data-inactive="0" data-tag="">0x (ERC20)</option>
+																		<option value="AAVEETH" data-img="aaveeth" data-network="ETH" data-shownetwork="1" data-coin="AAVE" data-inactive="0" data-tag="">Aave (ERC20)</option>
+																		<option value="APT" data-img="apt" data-network="APT" data-shownetwork="0" data-coin="APT" data-inactive="0" data-tag="">Aptos</option>
+																		<option value="ARB" data-img="arb" data-network="ARBITRUM" data-shownetwork="1" data-coin="ARB" data-inactive="0" data-tag="">Arbitrum (Arbitrum)</option>
+																		<option value="AVAX" data-img="avax" data-network="C-CHAIN" data-shownetwork="1" data-coin="AVAX" data-inactive="0" data-tag="">Avalanche (C-Chain)</option>
+																		<option value="BNBOPBNB" data-img="bnbopbnb" data-network="OPBNB" data-shownetwork="1" data-coin="BNB" data-inactive="0" data-tag="">BNB (opBNB)</option>
+																		<option value="BAT" data-img="bat" data-network="ETH" data-shownetwork="1" data-coin="BAT" data-inactive="0" data-tag="">Basic Attention (ERC20)</option>
+																		<option value="BTT" data-img="btt" data-network="TRX" data-shownetwork="1" data-coin="BTT" data-inactive="0" data-tag="">BitTorrent</option>
+																		<option value="BTCBSC" data-img="btcbsc" data-network="BSC" data-shownetwork="1" data-coin="BTC" data-inactive="0" data-tag="">Bitcoin (BEP20)</option>
+																		<option value="BTCLN" data-img="btcln" data-network="LN" data-shownetwork="1" data-coin="BTC" data-inactive="0" data-tag="">Bitcoin (Lightning)</option>
+																		<option value="BCH" data-img="bch" data-network="BCH" data-shownetwork="0" data-coin="BCH" data-inactive="0" data-tag="">Bitcoin Cash</option>
+																		<option value="ADA" data-img="ada" data-network="ADA" data-shownetwork="0" data-coin="ADA" data-inactive="0" data-tag="">Cardano</option>
+																		<option value="LINK" data-img="link" data-network="ETH" data-shownetwork="1" data-coin="LINK" data-inactive="0" data-tag="">Chainlink (ERC20)</option>
+																		<option value="ATOM" data-img="atom" data-network="ATOM" data-shownetwork="0" data-coin="ATOM" data-inactive="0" data-tag="MEMO">Cosmos</option>
+																		<option value="DAIBSC" data-img="daibsc" data-network="BSC" data-shownetwork="1" data-coin="DAI" data-inactive="0" data-tag="">DAI (BEP20)</option>
+																		<option value="DAIETH" data-img="daieth" data-network="ETH" data-shownetwork="1" data-coin="DAI" data-inactive="0" data-tag="">DAI (ERC20)</option>
+																		<option value="DAIMATIC" data-img="daimatic" data-network="POLYGON" data-shownetwork="1" data-coin="DAI" data-inactive="1" data-tag="">DAI (Polygon)</option>
+																		<option value="DASH" data-img="dash" data-network="DASH" data-shownetwork="0" data-coin="DASH" data-inactive="0" data-tag="">Dash</option>
+																		<option value="MANAETH" data-img="manaeth" data-network="ETH" data-shownetwork="1" data-coin="MANA" data-inactive="0" data-tag="">Decentraland (ERC20)</option>
+																		<option value="DOGE" data-img="doge" data-network="DOGE" data-shownetwork="0" data-coin="DOGE" data-inactive="0" data-tag="">Dogecoin</option>
+																		<option value="ETHARBITRUM" data-img="etharbitrum" data-network="ARBITRUM" data-shownetwork="1" data-coin="ETH" data-inactive="0" data-tag="">Ethereum (Arbitrum)</option>
+																		<option value="ETHBSC" data-img="ethbsc" data-network="BSC" data-shownetwork="1" data-coin="ETH" data-inactive="0" data-tag="">Ethereum (BEP20)</option>
+																		<option value="ETHBASE" data-img="ethbase" data-network="BASE" data-shownetwork="1" data-coin="ETH" data-inactive="0" data-tag="">Ethereum (Base)</option>
+																		<option value="ETHOP" data-img="ethop" data-network="OPTIMISM" data-shownetwork="1" data-coin="ETH" data-inactive="0" data-tag="">Ethereum (Optimism)</option>
+																		<option value="ETHZKSYNC" data-img="ethzksync" data-network="ZKSYNC" data-shownetwork="1" data-coin="ETH" data-inactive="0" data-tag="">Ethereum (ZkSync)</option>
+																		<option value="ETC" data-img="etc" data-network="ETC" data-shownetwork="0" data-coin="ETC" data-inactive="0" data-tag="">Ethereum Classic</option>
+																		<option value="KCS" data-img="kcs" data-network="KCC" data-shownetwork="1" data-coin="KCS" data-inactive="0" data-tag="">KuCoin Token</option>
+																		<option value="LTC" data-img="ltc" data-network="LTC" data-shownetwork="0" data-coin="LTC" data-inactive="0" data-tag="">Litecoin</option>
+																		<option value="PAXGETH" data-img="paxgeth" data-network="ETH" data-shownetwork="1" data-coin="PAXG" data-inactive="0" data-tag="">PAX Gold (ERC20)</option>
+																		<option value="CAKE" data-img="cake" data-network="BSC" data-shownetwork="1" data-coin="CAKE" data-inactive="0" data-tag="">PancakeSwap (BEP20)</option>
+																		<option value="USDP" data-img="usdp" data-network="ETH" data-shownetwork="1" data-coin="USDP" data-inactive="0" data-tag="">Pax Dollar (ERC20)</option>
+																		<option value="PEPEETH" data-img="pepeeth" data-network="ETH" data-shownetwork="1" data-coin="PEPE" data-inactive="0" data-tag="">Pepe (ERC20)</option>
+																		<option value="DOTAH" data-img="dotah" data-network="Asset Hub" data-shownetwork="1" data-coin="DOT" data-inactive="0" data-tag="">Polkadot (Asset Hub)</option>
+																		<option value="POL" data-img="pol" data-network="POLYGON" data-shownetwork="1" data-coin="POL" data-inactive="0" data-tag="">Polygon</option>
+																		<option value="POLETH" data-img="poleth" data-network="ETH" data-shownetwork="1" data-coin="POL" data-inactive="0" data-tag="">Polygon (ERC20)</option>
+																		<option value="XRP" data-img="xrp" data-network="XRP" data-shownetwork="0" data-coin="XRP" data-inactive="0" data-tag="Destination tag">Ripple</option>
+																		<option value="SHIBBSC" data-img="shibbsc" data-network="BSC" data-shownetwork="1" data-coin="SHIB" data-inactive="1" data-tag="">SHIBA INU (BEP20)</option>
+																		<option value="SHIB" data-img="shib" data-network="ETH" data-shownetwork="1" data-coin="SHIB" data-inactive="0" data-tag="">SHIBA INU (ERC20)</option>
+																		<option value="SOL" data-img="sol" data-network="SOL" data-shownetwork="0" data-coin="SOL" data-inactive="0" data-tag="">Solana</option>
+																		<option value="S" data-img="s" data-network="S" data-shownetwork="0" data-coin="S" data-inactive="0" data-tag="">Sonic</option>
+																		<option value="XLM" data-img="xlm" data-network="XLM" data-shownetwork="0" data-coin="XLM" data-inactive="0" data-tag="MEMO">Stellar Lumens</option>
+																		<option value="SUI" data-img="sui" data-network="SUI" data-shownetwork="0" data-coin="SUI" data-inactive="0" data-tag="">Sui</option>
+																		<option value="USDTARBITRUM" data-img="usdtarbitrum" data-network="ARBITRUM" data-shownetwork="1" data-coin="USDT" data-inactive="0" data-tag="">Tether (Arbitrum)</option>
+																		<option value="USDTBSC" data-img="usdtbsc" data-network="BSC" data-shownetwork="1" data-coin="USDT" data-inactive="0" data-tag="">Tether (BEP20)</option>
+																		<option value="USDTAVAX" data-img="usdtavax" data-network="C-CHAIN" data-shownetwork="1" data-coin="USDT" data-inactive="0" data-tag="">Tether (C-Chain)</option>
+																		<option value="USDTMATIC" data-img="usdtmatic" data-network="POLYGON" data-shownetwork="1" data-coin="USDT" data-inactive="0" data-tag="">Tether (Polygon)</option>
+																		<option value="USDTSOL" data-img="usdtsol" data-network="SOL" data-shownetwork="1" data-coin="USDT" data-inactive="0" data-tag="">Tether (Solana)</option>
+																		<option value="XTZ" data-img="xtz" data-network="XTZ" data-shownetwork="0" data-coin="XTZ" data-inactive="0" data-tag="">Tezos</option>
+																		<option value="TON" data-img="ton" data-network="TON" data-shownetwork="0" data-coin="TON" data-inactive="0" data-tag="MEMO/Comment">Toncoin</option>
+																		<option value="TRX" data-img="trx" data-network="TRX" data-shownetwork="0" data-coin="TRX" data-inactive="0" data-tag="">Tron</option>
+																		<option value="TUSD" data-img="tusd" data-network="ETH" data-shownetwork="1" data-coin="TUSD" data-inactive="0" data-tag="">TrueUSD (ERC20)</option>
+																		<option value="TWTBSC" data-img="twtbsc" data-network="BSC" data-shownetwork="1" data-coin="TWT" data-inactive="0" data-tag="MEMO">Trust Wallet Token (BEP20)</option>
+																		<option value="USDCARBITRUM" data-img="usdcarbitrum" data-network="ARBITRUM" data-shownetwork="1" data-coin="USDC" data-inactive="0" data-tag="">USD Coin (Arbitrum)</option>
+																		<option value="USDCBSC" data-img="usdcbsc" data-network="BSC" data-shownetwork="1" data-coin="USDC" data-inactive="0" data-tag="">USD Coin (BEP20)</option>
+																		<option value="USDCBASE" data-img="usdcbase" data-network="BASE" data-shownetwork="1" data-coin="USDC" data-inactive="0" data-tag="">USD Coin (Base)</option>
+																		<option value="USDCAVAX" data-img="usdcavax" data-network="C-CHAIN" data-shownetwork="1" data-coin="USDC" data-inactive="0" data-tag="">USD Coin (C-Chain)</option>
+																		<option value="USDCETH" data-img="usdceth" data-network="ETH" data-shownetwork="1" data-coin="USDC" data-inactive="0" data-tag="">USD Coin (ERC20)</option>
+																		<option value="USDCMATIC" data-img="usdcmatic" data-network="POLYGON" data-shownetwork="1" data-coin="USDC" data-inactive="1" data-tag="">USD Coin (Polygon)</option>
+																		<option value="USDCSOL" data-img="usdcsol" data-network="SOL" data-shownetwork="1" data-coin="USDC" data-inactive="0" data-tag="">USD Coin (Solana)</option>
+																		<option value="USDCOP" data-img="usdcop" data-network="OPTIMISM" data-shownetwork="1" data-coin="USDC" data-inactive="0" data-tag="">USDC (Optimism)</option>
+																		<option value="VET" data-img="vet" data-network="VET" data-shownetwork="0" data-coin="VET" data-inactive="0" data-tag="">VeChain</option>
+																		<option value="WBNBBSC" data-img="wbnbbsc" data-network="BSC" data-shownetwork="1" data-coin="WBNB" data-inactive="0" data-tag="">Wrapped BNB (BEP20)</option>
+																		<option value="WBNBOPBNB" data-img="wbnbopbnb" data-network="OPBNB" data-shownetwork="1" data-coin="WBNB" data-inactive="1" data-tag="">Wrapped BNB (opBNB)</option>
+																		<option value="WETHARBITRUM" data-img="wetharbitrum" data-network="ARBITRUM" data-shownetwork="1" data-coin="WETH" data-inactive="0" data-tag="">Wrapped ETH (Arbitrum)</option>
+																		<option value="WETHBASE" data-img="wethbase" data-network="BASE" data-shownetwork="1" data-coin="WETH" data-inactive="0" data-tag="">Wrapped ETH (Base)</option>
+																		<option value="WETHETH" data-img="wetheth" data-network="ETH" data-shownetwork="1" data-coin="WETH" data-inactive="0" data-tag="">Wrapped ETH (ERC20)</option>
+																		<option value="WETHMATIC" data-img="wethmatic" data-network="POLYGON" data-shownetwork="1" data-coin="WETH" data-inactive="1" data-tag="">Wrapped ETH (Polygon)</option>
+																		<option value="WSOL" data-img="wsol" data-network="SOL" data-shownetwork="1" data-coin="WSOL" data-inactive="0" data-tag="">Wrapped SOL (Solana)</option>
+																		<option value="ZEC" data-img="zec" data-network="ZEC" data-shownetwork="0" data-coin="ZEC" data-inactive="0" data-tag="">Zcash</option>
+										</select>
+					<input class="input-amount" autocomplete="off" type="text" value="" id="select_amount_from" data-dir="from" maxlength="18">
+					<div id="select_maxmin_from" class="hint maxmin"></div>
+					<span id="select_hinterror_from" class="hint error"></span>
+					<label id="select_label_from"></label>
+					<div class="exch-info">
+						<div class="input-rate" id="select_rate_from"></div>
+						<div class="rateusd"><span id="rate_usd_from"> </span></div>
+					</div>
+				</div>
+			</div>
+			<div class="col-middle">
+				<button class="btn-reverse" id="btn_reverse">
+					<span id="btn_reverse_from" class="btn-reverse-exch ico"></span>
+					<span id="btn_reverse_to" class="btn-reverse-receive ico"></span>
+				</button>
+			</div>
+			<div class="col">
+				<div class="wrap-header exch-header">
+					<header>Receive</header>
+					<div class="ccy-name" id="select_ccyname_to"></div>
+				</div>
+				<div class="input-wabbr toright">
+					<select id="select_currency_to" class="hidden">
+							<option label="separate">Popular currencies</option>
+																							<option value="BTC" data-img="btc" data-network="BTC" data-shownetwork="0" data-coin="BTC" data-inactive="0" data-tag="">Bitcoin</option>
+																		<option value="BSC" data-img="bsc" data-network="BSC" data-shownetwork="1" data-coin="BNB" data-inactive="0" data-tag="">BNB Smart Chain (BEP20)</option>
+																		<option value="ETH" data-img="eth" data-network="ETH" data-shownetwork="0" data-coin="ETH" data-inactive="0" data-tag="">Ethereum</option>
+																		<option value="USDT" data-img="usdt" data-network="ETH" data-shownetwork="1" data-coin="USDT" data-inactive="0" data-tag="">Tether (ERC20)</option>
+																		<option selected="" value="USDTTRC" data-img="usdttrc" data-network="TRX" data-shownetwork="1" data-coin="USDT" data-inactive="0" data-tag="">Tether (TRC20)</option>
+																		<option value="XMR" data-img="xmr" data-network="XMR" data-shownetwork="0" data-coin="XMR" data-inactive="0" data-tag="">Monero</option>
+																		<option label="separate">All currencies</option>
+																				<option value="ZRX" data-img="zrx" data-network="ETH" data-shownetwork="1" data-coin="ZRX" data-inactive="0" data-tag="">0x (ERC20)</option>
+																		<option value="AAVEETH" data-img="aaveeth" data-network="ETH" data-shownetwork="1" data-coin="AAVE" data-inactive="0" data-tag="">Aave (ERC20)</option>
+																		<option value="APT" data-img="apt" data-network="APT" data-shownetwork="0" data-coin="APT" data-inactive="0" data-tag="">Aptos</option>
+																		<option value="ARB" data-img="arb" data-network="ARBITRUM" data-shownetwork="1" data-coin="ARB" data-inactive="0" data-tag="">Arbitrum (Arbitrum)</option>
+																		<option value="AVAX" data-img="avax" data-network="C-CHAIN" data-shownetwork="1" data-coin="AVAX" data-inactive="0" data-tag="">Avalanche (C-Chain)</option>
+																		<option value="BNBOPBNB" data-img="bnbopbnb" data-network="OPBNB" data-shownetwork="1" data-coin="BNB" data-inactive="0" data-tag="">BNB (opBNB)</option>
+																		<option value="BAT" data-img="bat" data-network="ETH" data-shownetwork="1" data-coin="BAT" data-inactive="0" data-tag="">Basic Attention (ERC20)</option>
+																		<option value="BTT" data-img="btt" data-network="TRX" data-shownetwork="1" data-coin="BTT" data-inactive="0" data-tag="">BitTorrent</option>
+																		<option value="BTCBSC" data-img="btcbsc" data-network="BSC" data-shownetwork="1" data-coin="BTC" data-inactive="0" data-tag="">Bitcoin (BEP20)</option>
+																		<option value="BTCLN" data-img="btcln" data-network="LN" data-shownetwork="1" data-coin="BTC" data-inactive="0" data-tag="">Bitcoin (Lightning)</option>
+																		<option value="BCH" data-img="bch" data-network="BCH" data-shownetwork="0" data-coin="BCH" data-inactive="0" data-tag="">Bitcoin Cash</option>
+																		<option value="ADA" data-img="ada" data-network="ADA" data-shownetwork="0" data-coin="ADA" data-inactive="0" data-tag="">Cardano</option>
+																		<option value="LINK" data-img="link" data-network="ETH" data-shownetwork="1" data-coin="LINK" data-inactive="0" data-tag="">Chainlink (ERC20)</option>
+																		<option value="ATOM" data-img="atom" data-network="ATOM" data-shownetwork="0" data-coin="ATOM" data-inactive="0" data-tag="MEMO">Cosmos</option>
+																		<option value="DAIBSC" data-img="daibsc" data-network="BSC" data-shownetwork="1" data-coin="DAI" data-inactive="0" data-tag="">DAI (BEP20)</option>
+																		<option value="DAIETH" data-img="daieth" data-network="ETH" data-shownetwork="1" data-coin="DAI" data-inactive="0" data-tag="">DAI (ERC20)</option>
+																		<option value="DAIMATIC" data-img="daimatic" data-network="POLYGON" data-shownetwork="1" data-coin="DAI" data-inactive="0" data-tag="">DAI (Polygon)</option>
+																		<option value="DASH" data-img="dash" data-network="DASH" data-shownetwork="0" data-coin="DASH" data-inactive="0" data-tag="">Dash</option>
+																		<option value="MANAETH" data-img="manaeth" data-network="ETH" data-shownetwork="1" data-coin="MANA" data-inactive="0" data-tag="">Decentraland (ERC20)</option>
+																		<option value="DOGE" data-img="doge" data-network="DOGE" data-shownetwork="0" data-coin="DOGE" data-inactive="0" data-tag="">Dogecoin</option>
+																		<option value="ETHARBITRUM" data-img="etharbitrum" data-network="ARBITRUM" data-shownetwork="1" data-coin="ETH" data-inactive="0" data-tag="">Ethereum (Arbitrum)</option>
+																		<option value="ETHBSC" data-img="ethbsc" data-network="BSC" data-shownetwork="1" data-coin="ETH" data-inactive="0" data-tag="">Ethereum (BEP20)</option>
+																		<option value="ETHBASE" data-img="ethbase" data-network="BASE" data-shownetwork="1" data-coin="ETH" data-inactive="0" data-tag="">Ethereum (Base)</option>
+																		<option value="ETHOP" data-img="ethop" data-network="OPTIMISM" data-shownetwork="1" data-coin="ETH" data-inactive="0" data-tag="">Ethereum (Optimism)</option>
+																		<option value="ETHZKSYNC" data-img="ethzksync" data-network="ZKSYNC" data-shownetwork="1" data-coin="ETH" data-inactive="0" data-tag="">Ethereum (ZkSync)</option>
+																		<option value="ETC" data-img="etc" data-network="ETC" data-shownetwork="0" data-coin="ETC" data-inactive="0" data-tag="">Ethereum Classic</option>
+																		<option value="KCS" data-img="kcs" data-network="KCC" data-shownetwork="1" data-coin="KCS" data-inactive="0" data-tag="">KuCoin Token</option>
+																		<option value="LTC" data-img="ltc" data-network="LTC" data-shownetwork="0" data-coin="LTC" data-inactive="0" data-tag="">Litecoin</option>
+																		<option value="PAXGETH" data-img="paxgeth" data-network="ETH" data-shownetwork="1" data-coin="PAXG" data-inactive="0" data-tag="">PAX Gold (ERC20)</option>
+																		<option value="CAKE" data-img="cake" data-network="BSC" data-shownetwork="1" data-coin="CAKE" data-inactive="0" data-tag="">PancakeSwap (BEP20)</option>
+																		<option value="USDP" data-img="usdp" data-network="ETH" data-shownetwork="1" data-coin="USDP" data-inactive="0" data-tag="">Pax Dollar (ERC20)</option>
+																		<option value="PEPEETH" data-img="pepeeth" data-network="ETH" data-shownetwork="1" data-coin="PEPE" data-inactive="0" data-tag="">Pepe (ERC20)</option>
+																		<option value="DOTAH" data-img="dotah" data-network="Asset Hub" data-shownetwork="1" data-coin="DOT" data-inactive="0" data-tag="">Polkadot (Asset Hub)</option>
+																		<option value="POL" data-img="pol" data-network="POLYGON" data-shownetwork="1" data-coin="POL" data-inactive="0" data-tag="">Polygon</option>
+																		<option value="POLETH" data-img="poleth" data-network="ETH" data-shownetwork="1" data-coin="POL" data-inactive="0" data-tag="">Polygon (ERC20)</option>
+																		<option value="XRP" data-img="xrp" data-network="XRP" data-shownetwork="0" data-coin="XRP" data-inactive="0" data-tag="Destination tag">Ripple</option>
+																		<option value="SHIBBSC" data-img="shibbsc" data-network="BSC" data-shownetwork="1" data-coin="SHIB" data-inactive="0" data-tag="">SHIBA INU (BEP20)</option>
+																		<option value="SHIB" data-img="shib" data-network="ETH" data-shownetwork="1" data-coin="SHIB" data-inactive="0" data-tag="">SHIBA INU (ERC20)</option>
+																		<option value="SOL" data-img="sol" data-network="SOL" data-shownetwork="0" data-coin="SOL" data-inactive="0" data-tag="">Solana</option>
+																		<option value="S" data-img="s" data-network="S" data-shownetwork="0" data-coin="S" data-inactive="0" data-tag="">Sonic</option>
+																		<option value="XLM" data-img="xlm" data-network="XLM" data-shownetwork="0" data-coin="XLM" data-inactive="1" data-tag="MEMO">Stellar Lumens</option>
+																		<option value="SUI" data-img="sui" data-network="SUI" data-shownetwork="0" data-coin="SUI" data-inactive="0" data-tag="">Sui</option>
+																		<option value="USDTARBITRUM" data-img="usdtarbitrum" data-network="ARBITRUM" data-shownetwork="1" data-coin="USDT" data-inactive="0" data-tag="">Tether (Arbitrum)</option>
+																		<option value="USDTBSC" data-img="usdtbsc" data-network="BSC" data-shownetwork="1" data-coin="USDT" data-inactive="0" data-tag="">Tether (BEP20)</option>
+																		<option value="USDTAVAX" data-img="usdtavax" data-network="C-CHAIN" data-shownetwork="1" data-coin="USDT" data-inactive="0" data-tag="">Tether (C-Chain)</option>
+																		<option value="USDTMATIC" data-img="usdtmatic" data-network="POLYGON" data-shownetwork="1" data-coin="USDT" data-inactive="0" data-tag="">Tether (Polygon)</option>
+																		<option value="USDTSOL" data-img="usdtsol" data-network="SOL" data-shownetwork="1" data-coin="USDT" data-inactive="0" data-tag="">Tether (Solana)</option>
+																		<option value="XTZ" data-img="xtz" data-network="XTZ" data-shownetwork="0" data-coin="XTZ" data-inactive="0" data-tag="">Tezos</option>
+																		<option value="TON" data-img="ton" data-network="TON" data-shownetwork="0" data-coin="TON" data-inactive="0" data-tag="MEMO/Comment">Toncoin</option>
+																		<option value="TRX" data-img="trx" data-network="TRX" data-shownetwork="0" data-coin="TRX" data-inactive="0" data-tag="">Tron</option>
+																		<option value="TUSD" data-img="tusd" data-network="ETH" data-shownetwork="1" data-coin="TUSD" data-inactive="1" data-tag="">TrueUSD (ERC20)</option>
+																		<option value="TWTBSC" data-img="twtbsc" data-network="BSC" data-shownetwork="1" data-coin="TWT" data-inactive="0" data-tag="MEMO">Trust Wallet Token (BEP20)</option>
+																		<option value="USDCARBITRUM" data-img="usdcarbitrum" data-network="ARBITRUM" data-shownetwork="1" data-coin="USDC" data-inactive="0" data-tag="">USD Coin (Arbitrum)</option>
+																		<option value="USDCBSC" data-img="usdcbsc" data-network="BSC" data-shownetwork="1" data-coin="USDC" data-inactive="1" data-tag="">USD Coin (BEP20)</option>
+																		<option value="USDCBASE" data-img="usdcbase" data-network="BASE" data-shownetwork="1" data-coin="USDC" data-inactive="0" data-tag="">USD Coin (Base)</option>
+																		<option value="USDCAVAX" data-img="usdcavax" data-network="C-CHAIN" data-shownetwork="1" data-coin="USDC" data-inactive="0" data-tag="">USD Coin (C-Chain)</option>
+																		<option value="USDCETH" data-img="usdceth" data-network="ETH" data-shownetwork="1" data-coin="USDC" data-inactive="0" data-tag="">USD Coin (ERC20)</option>
+																		<option value="USDCMATIC" data-img="usdcmatic" data-network="POLYGON" data-shownetwork="1" data-coin="USDC" data-inactive="0" data-tag="">USD Coin (Polygon)</option>
+																		<option value="USDCSOL" data-img="usdcsol" data-network="SOL" data-shownetwork="1" data-coin="USDC" data-inactive="0" data-tag="">USD Coin (Solana)</option>
+																		<option value="USDCOP" data-img="usdcop" data-network="OPTIMISM" data-shownetwork="1" data-coin="USDC" data-inactive="0" data-tag="">USDC (Optimism)</option>
+																		<option value="VET" data-img="vet" data-network="VET" data-shownetwork="0" data-coin="VET" data-inactive="0" data-tag="">VeChain</option>
+																		<option value="WBNBBSC" data-img="wbnbbsc" data-network="BSC" data-shownetwork="1" data-coin="WBNB" data-inactive="0" data-tag="">Wrapped BNB (BEP20)</option>
+																		<option value="WBNBOPBNB" data-img="wbnbopbnb" data-network="OPBNB" data-shownetwork="1" data-coin="WBNB" data-inactive="1" data-tag="">Wrapped BNB (opBNB)</option>
+																		<option value="WETHARBITRUM" data-img="wetharbitrum" data-network="ARBITRUM" data-shownetwork="1" data-coin="WETH" data-inactive="0" data-tag="">Wrapped ETH (Arbitrum)</option>
+																		<option value="WETHBASE" data-img="wethbase" data-network="BASE" data-shownetwork="1" data-coin="WETH" data-inactive="0" data-tag="">Wrapped ETH (Base)</option>
+																		<option value="WETHETH" data-img="wetheth" data-network="ETH" data-shownetwork="1" data-coin="WETH" data-inactive="0" data-tag="">Wrapped ETH (ERC20)</option>
+																		<option value="WETHMATIC" data-img="wethmatic" data-network="POLYGON" data-shownetwork="1" data-coin="WETH" data-inactive="0" data-tag="">Wrapped ETH (Polygon)</option>
+																		<option value="WSOL" data-img="wsol" data-network="SOL" data-shownetwork="1" data-coin="WSOL" data-inactive="0" data-tag="">Wrapped SOL (Solana)</option>
+																		<option value="ZEC" data-img="zec" data-network="ZEC" data-shownetwork="0" data-coin="ZEC" data-inactive="0" data-tag="">Zcash</option>
+										</select>
+					<input class="input-amount" autocomplete="off" type="text" value="" id="select_amount_to" data-dir="to" maxlength="18">
+					<div id="select_maxmin_to" class="hint maxmin"></div>
+					<span id="select_hinterror_to" class="hint error"></span>
+					<label id="select_label_to"></label>
+					<div class="exch-info">
+						<div class="input-rate" id="select_rate_to"></div>
+						<div class="rateusd"><span id="rate_usd_to"> </span></div>
+					</div>
+				</div>
+			</div>
+		</div>
+				<div class="exchange-address-wrap">
+			<div class="exchange-wallet active center">
+				<div class="wrap-header">
+					<header>Destination</header>
+				</div>
+				<div class="field">
+					<textarea class="nonextra hidden" type="text" id="receive_wallet_hidden" autocomplete="off"></textarea>
+					<textarea class="nonextra" type="text" required="" id="receive_wallet" autocomplete="off"></textarea>
+					<span id="receive_wallet_error" class="hint error">Invalid address</span>
+					<div class="funcbuttons">
+						<button type="button" class="ico paste hoverhl" id="wallet_paste" title="Paste"></button>
+											<button type="button" class="ico scanqr hoverhl" id="wallet_scanqr" title="Scan QR code"></button>
+						<button type="button" class="ico close hoverhl" id="wallet_clear"></button>
+					</div>
+								</div>
+			</div>
+			<div class="exchange-wallet exchange-wallet-extra center" id="wallet_extra_outer">
+				<div class="wrap-header">
+					<header id="receive_extraid_label">Destination Tag (optional)</header>
+				</div>
+				<div class="field">
+					<input class="nonextra" type="text" value="" required="" id="receive_extraid" autocomplete="off">
+					<span id="receive_extraid_error" class="hint error">Invalid</span>
+					<div class="funcbuttons"><button type="button" class="ico paste hoverhl none" id="extraid_paste"></button><button type="button" class="ico close hoverhl" id="extraid_clear"></button></div>
+				</div>
+			</div>
+		</div>
+				<div class="exchange-wrapflex">
+						<div class="exchange-option">
+				<header>Order type</header>
+				<div class="exchange-option-inner">
+					<label class="radioselect">
+						<input type="radio" name="select_type_from" value="fixed" id="fixed_type">
+						<span><font>Fixed rate (1.0%)</font><i></i></span>
+					</label><label class="radioselect">
+						<input type="radio" name="select_type_from" value="float" id="float_type" checked="">
+						<span><font>Float rate (0.5%)</font><i></i></span>
+					</label>
+				</div>
+				<span id="type_difference" class="exchange-option-diff"><div class="exchange-option-diff-inner"><i>?</i><font>What is the difference?</font></div></span>
+			</div>
+						<div class="exchange-button center">
+				<button id="exchange_submit" class="exchange-submit disabled"><span>Exchange now</span></button>
+			</div>
+		</div>
+			<div class="exchange-terms">By using the site and creating an exchange, you agree to the FixedFloat's <a href="/terms-of-service">Terms of Services</a> and <a href="/privacy-policy">Privacy Policy</a></div>
+		</form>
+</div>
+<template id="difference_tmpl">
+	<div class="popup-content popup-full-mobile">
+		<div class="popup-close"></div>
+		<h3>What is the difference between fixed and a float rates?</h3>
+		<div class="exchange-different-faq"><h3 style="margin-bottom:0.2em;"><b>Fixed rate</b></h3>
+<p style="margin-bottom:0.2em;">Opting for a fixed rate, you get the price you see at the point of initiating a transaction.</p>
+<ul class="list">
+<li>Pay just 1% + network fee.</li>
+<li>Rates freeze for 10 minutes.</li>
+<li>If the market rate changes by more than 1.2% <span>before the appearance of your transaction on the blockchain network</span>, you will be asked to make a refund or continue exchanging at the market rate.</li>
+</ul>
+<p><em>Attention! Your transaction must be received within 10 minutes and the amount must exactly match the amount of the order. Otherwise, you will be prompted to make a refund or continue the exchange at the market rate.</em></p>
+<h3 style="margin-bottom:0.2em;margin-top:1.4em;"><b>Float rate</b></h3>
+<p>The exchange rate is finally set when your transaction receives the necessary number of blockchain network confirmations. If the market goes up, you will get more cryptocurrency, if down - less. All fair.</p>
+<ul class="list">
+<li>Pay just 0.5% + network fee.</li>
+<li>The exchange will be made at the market rate, which is finally set within 10 minutes after your transaction receives the required number of confirmations in the blockchain network.</li>
+</ul>
+<p class="faq-exchange-example"><strong>Example</strong>: you are exchanging 1 BTC for 28.37362388 ETH. With a <strong>fixed</strong> rate, you will receive exactly 28.37362388 ETH. With a <strong>float</strong> exchange rate, the amount of ETH can change both up and down. It depends on changes in the market rate.</p></div>
+		<div class="popup-ctrl"><span class="btn submit popup-close-btn bghl">Ok</span></div>
+	</div>
+</template>
+<template id="popup_warning_fee">
+	<div class="popup-content popup-confirm popup-confirm-whead popup-full-mobile">
+		<header>Attention! High network fees!</header>
+		<div class="popup-confirm-body popup-mobile-body-full">
+			<p>Please note that the total network fees for sending a transaction and consolidating the funds received represent a significant part of the total exchange amount for this direction.<br><b>Your exchange for this amount can be very unprofitable.</b></p>
+					<p>You can read more about this problem in <a href="#">our article on the formation of rates</a>.</p>
+				</div>
+			<div class="popup-ctrl">
+			<button type="button" class="btn cancel popup-close-btn">Cancel exchange</button>
+			<button type="button" class="btn submit">I understand and confirm this</button>
+		</div>
+		</div>
+</template>
+<template id="popup_forbidden_usa">
+	<div class="popup-content fix-width2">
+		<h3 style="margin-bottom: 1.3em;">Important Notice</h3>
+		<p style="text-align: center;margin-bottom: 0.2em;">U.S. persons cannot make an exchange on FixedFloat.com</p>
+		<div class="popup-ctrl"><span class="btn submit popup-close-btn bghl">I understand</span></div>
+	</div>
+</template>
+<template id="popup_tgaddressbook">
+	<div class="popup-content popup-full popup-flex">
+		<header>
+			<div class="head">Address book</div>
+			<div class="btn-wrap">
+			</div>
+		</header>
+	<div class="addresss-list-wrap">
+		<div class="addresss-list" id="wallet_tgaddressbook" data-emptylist="Favorite address is empty"></div>
+	</div>
+</div></template>
+<script type="text/javascript">
+	document.addEventListener("DOMContentLoaded", function() {
+		moment.locale('en');
+		let F = UI.func;
+
+		let data = {
+			reqFrom:        '',
+			reqTo:          '',
+			type:           'float',
+			address:        '',
+			extra:          '',
+			toAmount:       undefined,
+			fromAmount:     undefined,
+			lockAmount:     false,
+			lockType:       false,
+			lockSend:       false,
+			lockReceive:    false,
+			lockAddress:    false,
+			errorIgnore:    false,
+			floatLNInvoice: true,
+
+			search_ph:            'Type a currency or ticker',
+			search_found:         'Found currencies',
+			address_ph:           'Your {1} address',
+			invoice_ph:           'Your {1} invoice',
+			favaddress_ph:        'Find your {1} address in the list',
+			address_invalid:      'Invalid address',
+			route_invalid:        'Invalid route, unable to find a path to destination',
+			address_error:        'Enter your {1} address',
+			invoice_error:        'Enter your {1} address',
+			limit_min:            'Minimum amount {1}',
+			limit_max:            'You exceeded the limit of {1}',
+			maintenance:          'Network temporarily suspended for maintenance',
+			ccy_offline:          'The network is offline',
+			ccy_reserve:          'The currency is awaiting the addition of reserves',
+			recoverytime:         'Estimated network recovery time',
+			recoverytime_hour:    'Estimated recovery time within an hour',
+			recoverytime_hours:   'Estimated recovery time is within {1} hours',
+			recoverytime_day:     'Estimated recovery time during the day',
+			recoverytime_days:    'Estimated recovery time within {1} days',
+			clipboard_permission: 'You need to give the browser permission to use your clipboard',
+			internal_error:       'Error! Try reloading the page',
+
+			addressbook_fav:  'Favorite addresses',
+			addressbook_last: 'Last used addresses',
+
+			selector_tmpl: '<div class="coin-ticker"><span class="name">{coin}</span>{#shownetwork}<sup data-network="{network}"><span>{network}</span></sup>{\\shownetwork}</div><div class="coin-ico svgcoin {img}"></div><div class="coin-outer"><span class="coin-name">{label}</span></div>',
+			label_tmpl:    '<span class="coin-img svgcoin {img}"></span><span class="coin-name"><span class="name">{coin}</span>{#shownetwork}<sup data-network="{network}">{network}</sup>{\\shownetwork}</span>',
+			address_tmpl:  '<label class="addressbook-favorite {#favorite}active{\\favorite}"><span class="ico star"></label><span class="address">{address}</span>{#tag}<span class="tag">:{tag}</span>{\\tag}',
+
+			popup_warning_fee:   F.id('popup_warning_fee').innerHTML,
+			popup_forbidden_usa: F.id('popup_forbidden_usa').innerHTML,
+			alert_forbidden_usa: 'U.S. persons cannot make an exchange on FixedFloat.com',
+		}
+
+		Exchange.init(data);
+
+		F.bind('type_difference', 'click', function(e) {
+			e = e || event;
+			e.preventDefault();
+			UI.popup({
+				html: F.id('difference_tmpl').innerHTML,
+				class: 'foreground',
+			}).show();
+		})
+	})
+</script>
+            </div>
+        </section>
+        <section class="advantages-section" id="advantages">
+            <div class="wrapper">
+                <h2><span>Trusted since 2018</span></h2>
+                <div class="advantages-inner">
+                    <div class="col adv-fast">
+                        <div class="advantages-image wimg"><img src="images/fill.svg"></div>
+                        <div class="advantages-descr">
+                            <h3 class="hl">Save time</h3>
+                            <p>Maximum exchange speed due to the full automation</p>
+                        </div>
+                    </div>
+                    <div class="col adv-easy">
+                        <div class="advantages-image wimg"><img src="images/fill.svg"></div>
+                        <div class="advantages-descr">
+                            <h3 class="hl">Make an exchange</h3>
+                            <p>Pick the right strategy and make favourable trades</p>
+                        </div>
+                    </div>
+                    <div class="col adv-profitable">
+                        <div class="advantages-image wimg"><img src="images/fill.svg"></div>
+                        <div class="advantages-descr">
+                            <h3 class="hl">Save money</h3>
+                            <p>Best exchange rates and minimum commissions</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="recent-section">
+            <div class="background">
+                <img src="images/recent.svg" class="none">
+            </div>
+            <div class="wrapper">
+                <h2 class="center"><span>Recent transactions</span></h2>
+                <ul class="recent-list" id="recent_list">
+                                    <li>
+                        <div class="recent-time">
+                            <time timestamp="1769349364"></time>
+                        </div>
+                        <div class="dir-from">
+                            <div class="coin-value">51.1482 USDC</div>
+                            <div class="coin-ico svgcoin usdcsol"></div>
+                        </div>
+                        <div class="dir-arrow">
+                            <span class="ico arrow"></span>
+                        </div>
+                        <div class="dir-to">
+                            <div class="coin-ico svgcoin usdttrc"></div>
+                            <div class="coin-value">USDT</div>
+                                                </div>
+                        <div class="recent-howlong">
+                            <i class="ico timer"></i><span class="recent-timer" data-time="3"></span>
+                        </div>
+                    </li>
+                                    <li>
+                        <div class="recent-time">
+                            <time timestamp="1769349343"></time>
+                        </div>
+                        <div class="dir-from">
+                            <div class="coin-value">44.5 TON</div>
+                            <div class="coin-ico svgcoin ton"></div>
+                        </div>
+                        <div class="dir-arrow">
+                            <span class="ico arrow"></span>
+                        </div>
+                        <div class="dir-to">
+                            <div class="coin-ico svgcoin btc"></div>
+                            <div class="coin-value">BTC</div>
+                                                </div>
+                        <div class="recent-howlong">
+                            <i class="ico timer"></i><span class="recent-timer" data-time="14"></span>
+                        </div>
+                    </li>
+                                    <li>
+                        <div class="recent-time">
+                            <time timestamp="1769349334"></time>
+                        </div>
+                        <div class="dir-from">
+                            <div class="coin-value">15.89 USDT</div>
+                            <div class="coin-ico svgcoin usdttrc"></div>
+                        </div>
+                        <div class="dir-arrow">
+                            <span class="ico arrow"></span>
+                        </div>
+                        <div class="dir-to">
+                            <div class="coin-ico svgcoin usdtbsc"></div>
+                            <div class="coin-value">USDT</div>
+                                                </div>
+                        <div class="recent-howlong">
+                            <i class="ico timer"></i><span class="recent-timer" data-time="2"></span>
+                        </div>
+                    </li>
+                                    <li>
+                        <div class="recent-time">
+                            <time timestamp="1769349311"></time>
+                        </div>
+                        <div class="dir-from">
+                            <div class="coin-value">300 USDC</div>
+                            <div class="coin-ico svgcoin usdcbsc"></div>
+                        </div>
+                        <div class="dir-arrow">
+                            <span class="ico arrow"></span>
+                        </div>
+                        <div class="dir-to">
+                            <div class="coin-ico svgcoin bsc"></div>
+                            <div class="coin-value">BNB</div>
+                                                </div>
+                        <div class="recent-howlong">
+                            <i class="ico timer"></i><span class="recent-timer" data-time="3"></span>
+                        </div>
+                    </li>
+                                    <li>
+                        <div class="recent-time">
+                            <time timestamp="1769349279"></time>
+                        </div>
+                        <div class="dir-from">
+                            <div class="coin-value">0.00194 ETH</div>
+                            <div class="coin-ico svgcoin ethbase"></div>
+                        </div>
+                        <div class="dir-arrow">
+                            <span class="ico arrow"></span>
+                        </div>
+                        <div class="dir-to">
+                            <div class="coin-ico svgcoin ltc"></div>
+                            <div class="coin-value">LTC</div>
+                                                </div>
+                        <div class="recent-howlong">
+                            <i class="ico timer"></i><span class="recent-timer" data-time="10"></span>
+                        </div>
+                    </li>
+                                    <li>
+                        <div class="recent-time">
+                            <time timestamp="1769349278"></time>
+                        </div>
+                        <div class="dir-from">
+                            <div class="coin-value">1900 USDT</div>
+                            <div class="coin-ico svgcoin usdtsol"></div>
+                        </div>
+                        <div class="dir-arrow">
+                            <span class="ico arrow"></span>
+                        </div>
+                        <div class="dir-to">
+                            <div class="coin-ico svgcoin usdceth"></div>
+                            <div class="coin-value">USDC</div>
+                                                </div>
+                        <div class="recent-howlong">
+                            <i class="ico timer"></i><span class="recent-timer" data-time="5"></span>
+                        </div>
+                    </li>
+                                    <li>
+                        <div class="recent-time">
+                            <time timestamp="1769349273"></time>
+                        </div>
+                        <div class="dir-from">
+                            <div class="coin-value">0.00194 ETH</div>
+                            <div class="coin-ico svgcoin ethbase"></div>
+                        </div>
+                        <div class="dir-arrow">
+                            <span class="ico arrow"></span>
+                        </div>
+                        <div class="dir-to">
+                            <div class="coin-ico svgcoin doge"></div>
+                            <div class="coin-value">DOGE</div>
+                                                </div>
+                        <div class="recent-howlong">
+                            <i class="ico timer"></i><span class="recent-timer" data-time="4"></span>
+                        </div>
+                    </li>
+                                    <li>
+                        <div class="recent-time">
+                            <time timestamp="1769349251"></time>
+                        </div>
+                        <div class="dir-from">
+                            <div class="coin-value">0.00194 ETH</div>
+                            <div class="coin-ico svgcoin ethbase"></div>
+                        </div>
+                        <div class="dir-arrow">
+                            <span class="ico arrow"></span>
+                        </div>
+                        <div class="dir-to">
+                            <div class="coin-ico svgcoin xrp"></div>
+                            <div class="coin-value">XRP</div>
+                                                </div>
+                        <div class="recent-howlong">
+                            <i class="ico timer"></i><span class="recent-timer" data-time="3"></span>
+                        </div>
+                    </li>
+                                    <li>
+                        <div class="recent-time">
+                            <time timestamp="1769349232"></time>
+                        </div>
+                        <div class="dir-from">
+                            <div class="coin-value">135.482 USDT</div>
+                            <div class="coin-ico svgcoin usdtbsc"></div>
+                        </div>
+                        <div class="dir-arrow">
+                            <span class="ico arrow"></span>
+                        </div>
+                        <div class="dir-to">
+                            <div class="coin-ico svgcoin btc"></div>
+                            <div class="coin-value">BTC</div>
+                                                </div>
+                        <div class="recent-howlong">
+                            <i class="ico timer"></i><span class="recent-timer" data-time="25"></span>
+                        </div>
+                    </li>
+                                    <li>
+                        <div class="recent-time">
+                            <time timestamp="1769349217"></time>
+                        </div>
+                        <div class="dir-from">
+                            <div class="coin-value">171.341 USDT</div>
+                            <div class="coin-ico svgcoin usdtbsc"></div>
+                        </div>
+                        <div class="dir-arrow">
+                            <span class="ico arrow"></span>
+                        </div>
+                        <div class="dir-to">
+                            <div class="coin-ico svgcoin btc"></div>
+                            <div class="coin-value">BTC</div>
+                                                </div>
+                        <div class="recent-howlong">
+                            <i class="ico timer"></i><span class="recent-timer" data-time="14"></span>
+                        </div>
+                    </li>
+                                </ul>
+            </div>
+        </section>
+        <section class="faq-section" id="faq_wrapper">
+            <div class="wrapper">
+                <h2><span>FAQ</span></h2>
+                <ol class="faq-list">
+                    <li>
+                        <h4><span>How can I track my order?</span></h4>
+                        <div><div class="faq-inner">
+                            <p>In three ways: by email (if you leave your email address), on our website (if your browser accepts cookies) or by viewing the transactions in the blockchain by the links from your order.</p>
+                        </div></div>
+                    </li>
+                    <li>
+                        <h4><span>Why can I trust you?</span></h4>
+                        <div><div class="faq-inner">
+                            <p>No registration and no need to share your personal details. We don't hold your funds, all exchanges take place instantly in fully automatic mode.</p>
+                            <p class="reviews-images">
+                                <a rel="noopener noreferrer" target="_blank" class="svgreviews tw" title="twitter.com" href="https://twitter.com/fixedfloat"></a>
+                                <a rel="noopener noreferrer" target="_blank" class="svgreviews tg" title="Telegram" href="https://t.me/FixedFloat"></a>
+                                <a rel="noopener noreferrer" target="_blank" class="svgreviews medium" title="medium.com" href="https://medium.com/fixedfloat"></a>
+                                <a rel="noopener noreferrer" target="_blank" class="svgreviews instagram" title="instagram.com" href="https://www.instagram.com/fixedfloat/"></a>
+                                <a rel="noopener noreferrer" target="_blank" class="svgreviews reddit" title="reddit.com" href="https://www.reddit.com/user/FixedFloat/"></a>
+                                <a rel="noopener noreferrer" target="_blank" class="svgreviews bitcointalk" title="bitcointalk.org" href="https://bitcointalk.org/index.php?topic=5107342.new#new"></a>
+                                <a rel="noopener noreferrer" target="_blank" class="svgreviews bestchange" title="bestchange.com" href="https://www.bestchange.com/fixedfloat-exchanger.html"></a>
+                                <a rel="noopener noreferrer" target="_blank" class="svgreviews trustpilot" title="trustpilot.com" href="https://www.trustpilot.com/review/fixedfloat.com"></a>
+                                                    </p></div></div>
+                        <p></p>
+                    </li>
+                    <li>
+                        <h4><span>Do you have hidden fees?</span></h4>
+                        <div><div class="faq-inner">
+                            <p>Honesty is our main priority, so we commit to full transparency and make all the fees clear:</p>
+                            <p>•  1% if you opt for a <b>fixed rate</b><br>•  0.5% if you opt for a <b>floating rate</b></p>
+                        </div></div>
+                    </li>
+                
+                <div class="faq-more"><a href="#"><span>Go to page FAQ</span> <i class="ico arrow-forward"></i></a></div>
+            </ol></div>
+        </section>
+        <section class="news-section">
+            <div class="wrapper">
+                <h2>News</h2>
+                <div class="index-news" id="index_news">
+                                    <article class="blog-post blog-post-onbg bg-img" style="background-image: url('images/FF-New_News_01-26_02_w768.jpg');">
+    <div class="blog-post-body">
+        <header class="blog-post-head">
+            <span class="blog-post-header">News of cryptocurrencies of the 3rd week of January 2026</span>
+            <div class="blog-time"><time timestamp="1768651200"></time></div>
+        </header>
+        <div class="blog-post-desc">XMR price rise, Sui network failure, GWEI token launch.</div>
+        <div class="blog-post-read-outer">
+            <a href="#" class="btn mini">Read</a>
+        </div>
+    </div>
+</article>                                    <article class="blog-post blog-post-onbg bg-img" style="background-image: url('images/FF-New_News_01-26_01_w768.jpg');">
+    <div class="blog-post-body">
+        <header class="blog-post-head">
+            <span class="blog-post-header">News of cryptocurrencies of the 2nd week of January 2026</span>
+            <div class="blog-time"><time timestamp="1768046400"></time></div>
+        </header>
+        <div class="blog-post-desc">Bitcoin celebrated its 17th anniversary, the fall of Zcash and the rise of Monero.</div>
+        <div class="blog-post-read-outer">
+            <a href="#" class="btn mini">Read</a>
+        </div>
+    </div>
+</article>                                    <article class="blog-post blog-post-onbg bg-img" style="background-image: url('images/FF-New_News_12-25_04-Christmas_v3_w768.jpg');">
+    <div class="blog-post-body">
+        <header class="blog-post-head">
+            <span class="blog-post-header">Merry Christmas and Happy New Year!</span>
+            <div class="blog-time"><time timestamp="1766577600"></time></div>
+        </header>
+        <div class="blog-post-desc">FixedFloat congratulates you on the upcoming holidays!</div>
+        <div class="blog-post-read-outer">
+            <a href="#" class="btn mini">Read</a>
+        </div>
+    </div>
+</article>                                    <article class="blog-post blog-post-onbg bg-img" style="background-image: url('images/FF-New_News_12-25_03_w768.jpg');">
+    <div class="blog-post-body">
+        <header class="blog-post-head">
+            <span class="blog-post-header">News of cryptocurrencies of the 3rd week of December 2025</span>
+            <div class="blog-time"><time timestamp="1766232000"></time></div>
+        </header>
+        <div class="blog-post-desc">DDoS attack on Solana network, demand for Bitcoin increased, Solana tests post-quantum digital signatures.</div>
+        <div class="blog-post-read-outer">
+            <a href="#" class="btn mini">Read</a>
+        </div>
+    </div>
+</article>                                    <article class="blog-post blog-post-onbg bg-img" style="background-image: url('images/FF-New_News_12-25_02_w768.jpg');">
+    <div class="blog-post-body">
+        <header class="blog-post-head">
+            <span class="blog-post-header">News of cryptocurrencies of the 2nd week of December 2025</span>
+            <div class="blog-time"><time timestamp="1765627200"></time></div>
+        </header>
+        <div class="blog-post-desc">A hard fork has taken place on the Polygon network, wXRP will become available on the Ethereum and Solana networks, and Tether plans to buy Juventus.</div>
+        <div class="blog-post-read-outer">
+            <a href="#" class="btn mini">Read</a>
+        </div>
+    </div>
+</article>                                </div>
+                <div class="nav-block">
+                    <div class="nav"><button type="button" class="btn border white circle ico arrow nav-prev" id="index_news_prev"></button></div>
+                    <div class="nav"><button type="button" class="btn border white circle ico arrow nav-next" id="index_news_next"></button></div>
+                    <div class="nav-line-wrap">
+                        <div class="nav-line" id="index_news_line"></div>
+                    </div>
+                    <div class="nav-all">
+                        <a class="btn border" href="#">All news</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="guides-section">
+            <div class="wrapper">
+                <h2>Guides and tutorials</h2>
+                <div class="blog-carousel" id="index_guides">
+                                    <a href="#" class="blog-post">
+    <div class="blog-post-img">
+     
+    	<div class="blog-post-img-bg" data-cat="guides" style="background-image: url('images/crypto_wallets_w768.jpg');"></div>
+        	<img src="images/crypto_wallets_w768.jpg" alt="Types of cryptocurrency wallets">
+    </div>
+    <div class="blog-post-body">
+        <div class="blog-post-wrap">
+            <div class="blog-post-webkitbox">
+                <header class="blog-post-head">Types of cryptocurrency wallets</header>
+                <div class="blog-post-desc">FixedFloat is a non-custodial exchange, our users take care of storing their coins on their own. We figured out the types of wallets and gave some tips on choosing the right one.</div>
+            </div>
+        </div>
+        <div class="blog-time"><time timestamp="1669896000"></time></div>
+    </div>
+</a>                                    <a href="#" class="blog-post">
+    <div class="blog-post-img">
+     
+    	<div class="blog-post-img-bg" data-cat="guides" style="background-image: url('images/ff_news_ethpos_w768.jpg');"></div>
+        	<img src="images/ff_news_ethpos_w768.jpg" alt="Ethereum’s transition from Proof-of-Work to Proof-of-Stake">
+    </div>
+    <div class="blog-post-body">
+        <div class="blog-post-wrap">
+            <div class="blog-post-webkitbox">
+                <header class="blog-post-head">Ethereum’s transition from Proof-of-Work to Proof-of-Stake</header>
+                <div class="blog-post-desc">A week has passed since the Ethereum merger, it's time to take stock of the results of the network upgrade.</div>
+            </div>
+        </div>
+        <div class="blog-time"><time timestamp="1664107200"></time></div>
+    </div>
+</a>                                    <a href=#" class="blog-post">
+    <div class="blog-post-img">
+     
+    	<div class="blog-post-img-bg" data-cat="guides" style="background-image: url('images/how-to-exchange_w768.jpg');"></div>
+        	<img src="images/how-to-exchange_w768.jpg" alt="How to exchange cryptocurrencies on the FixedFloat?">
+    </div>
+    <div class="blog-post-body">
+        <div class="blog-post-wrap">
+            <div class="blog-post-webkitbox">
+                <header class="blog-post-head">How to exchange cryptocurrencies on the FixedFloat?</header>
+                <div class="blog-post-desc">Step-by-step instruction for exchanging cryptocurrencies on the FixedFloat.</div>
+            </div>
+        </div>
+        <div class="blog-time"><time timestamp="1638532800"></time></div>
+    </div>
+</a>                                    <a href="#" class="blog-post">
+    <div class="blog-post-img">
+     
+    	<div class="blog-post-img-bg" data-cat="guides" style="background-image: url('images/avoidscam_w768.jpg');"></div>
+        	<img src="images/avoidscam_w768.jpg" alt="How to avoid scams and theft of your crypto?">
+    </div>
+    <div class="blog-post-body">
+        <div class="blog-post-wrap">
+            <div class="blog-post-webkitbox">
+                <header class="blog-post-head">How to avoid scams and theft of your crypto?</header>
+                <div class="blog-post-desc">In this article, we have covered the most popular types of scams and how to avoid them. This knowledge can help cryptocurrency users to prematurely notice potential fraud and protect funds from intruders.</div>
+            </div>
+        </div>
+        <div class="blog-time"><time timestamp="1635249600"></time></div>
+    </div>
+</a>                                    <a href="#" class="blog-post">
+    <div class="blog-post-img">
+     
+    	<div class="blog-post-img-bg" data-cat="guides" style="background-image: url('images/recover_tokens_w768.jpg');"></div>
+        	<img src="images/recover_tokens_w768.jpg" alt="How to recover tokens when sending to the wrong network?">
+    </div>
+    <div class="blog-post-body">
+        <div class="blog-post-wrap">
+            <div class="blog-post-webkitbox">
+                <header class="blog-post-head">How to recover tokens when sending to the wrong network?</header>
+                <div class="blog-post-desc">When exchanging cryptocurrency for FixedFloat, you probably noticed that different networks are available for some coins. We will figure out with you why it is so important to choose the correct blockchain for your wallet, as well as what to do if you mistakenly sent coins to another network.</div>
+            </div>
+        </div>
+        <div class="blog-time"><time timestamp="1631620800"></time></div>
+    </div>
+</a>                                    <a href="#" class="blog-post">
+    <div class="blog-post-img">
+     
+    	<div class="blog-post-img-bg" data-cat="guides" style="background-image: url('images/what-is-miner-fee_w768.jpg');"></div>
+        	<img src="images/what-is-miner-fee_w768.jpg" alt="What is the miner fee?">
+    </div>
+    <div class="blog-post-body">
+        <div class="blog-post-wrap">
+            <div class="blog-post-webkitbox">
+                <header class="blog-post-head">What is the miner fee?</header>
+                <div class="blog-post-desc">In most blockchains, a Miner fee is charged from the user when sending a transaction. We have prepared for you a detailed explanation of why you pay the Miner fee and how to correctly determine the amount of the fee</div>
+            </div>
+        </div>
+        <div class="blog-time"><time timestamp="1628683200"></time></div>
+    </div>
+</a>                                    <a href="#" class="blog-post">
+    <div class="blog-post-img">
+     
+    	<div class="blog-post-img-bg" data-cat="guides" style="background-image: url('images/stablecoins_w768.jpg');"></div>
+        	<img src="images/stablecoins_w768.jpg" alt="Features and disadvantages of stablecoins">
+    </div>
+    <div class="blog-post-body">
+        <div class="blog-post-wrap">
+            <div class="blog-post-webkitbox">
+                <header class="blog-post-head">Features and disadvantages of stablecoins</header>
+                <div class="blog-post-desc">Comparison of stablecoins, their advantages and disadvantages.</div>
+            </div>
+        </div>
+        <div class="blog-time"><time timestamp="1615636800"></time></div>
+    </div>
+</a>                                    <a href="#" class="blog-post">
+    <div class="blog-post-img">
+     
+    	<div class="blog-post-img-bg" data-cat="guides" style="background-image: url('images/how-rate-formed_w768.jpg');"></div>
+        	<img src="images/how-rate-formed_w768.jpg" alt="How is the rate formed on the FixedFloat?">
+    </div>
+    <div class="blog-post-body">
+        <div class="blog-post-wrap">
+            <div class="blog-post-webkitbox">
+                <header class="blog-post-head">How is the rate formed on the FixedFloat?</header>
+                <div class="blog-post-desc">When creating an order for FixedFloat, users see the amount that includes all the fees necessary for the exchange. This article explains what fees are included in the FixedFloat rate and why it is sometimes unprofitable to change small amounts.</div>
+            </div>
+        </div>
+        <div class="blog-time"><time timestamp="1606996800"></time></div>
+    </div>
+</a>                                    <a href="#" class="blog-post">
+    <div class="blog-post-img">
+     
+    	<div class="blog-post-img-bg" data-cat="guides" style="background-image: url('images/what-is-consolidation_w768.jpg');"></div>
+        	<img src="images/what-is-consolidation_w768.jpg" alt="What is consolidation in cryptocurrencies?">
+    </div>
+    <div class="blog-post-body">
+        <div class="blog-post-wrap">
+            <div class="blog-post-webkitbox">
+                <header class="blog-post-head">What is consolidation in cryptocurrencies?</header>
+                <div class="blog-post-desc">An important part of working with cryptocurrency is consolidation. But not all users know about it. We have prepared for you a detailed explanation of consolidation, how it works and the situations in which it is necessary.</div>
+            </div>
+        </div>
+        <div class="blog-time"><time timestamp="1606737600"></time></div>
+    </div>
+</a>                                    <a href="#" class="blog-post">
+    <div class="blog-post-img">
+     
+    	<div class="blog-post-img-bg" data-cat="guides" style="background-image: url('images/rbf-eth_w768.jpg');"></div>
+        	<img src="images/rbf-eth_w768.jpg" alt="Replacing and canceling Ethereum transactions">
+    </div>
+    <div class="blog-post-body">
+        <div class="blog-post-wrap">
+            <div class="blog-post-webkitbox">
+                <header class="blog-post-head">Replacing and canceling Ethereum transactions</header>
+                <div class="blog-post-desc">Users sometimes have a situation when they need to cancel or replace an Ethereum transaction. The article discusses ways in which you can do this.</div>
+            </div>
+        </div>
+        <div class="blog-time"><time timestamp="1601294400"></time></div>
+    </div>
+</a>                                </div>
+                <div class="nav-block">
+                    <div class="nav"><button type="button" class="btn border white circle ico arrow nav-prev" id="index_guides_prev"></button></div>
+                    <div class="nav"><button type="button" class="btn border white circle ico arrow nav-next" id="index_guides_next"></button></div>
+                    <div class="nav-line-wrap">
+                        <div class="nav-line" id="index_guides_line"></div>
+                    </div>
+                    <div class="nav-all">
+                        <a class="btn border" href="#">Read all</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            let F = UI.func;
+            moment.locale('en');
+            Array.from(document.querySelectorAll('.blog-post time[timestamp]')).forEach(function(obj) {
+                let time = moment(moment.unix(+obj.getAttribute('timestamp')).toDate()).local();
+                obj.innerHTML = time.format('LL');
+            })
+            Array.from(document.querySelectorAll('#recent_list time')).forEach(function(obj) {
+                let time = moment(moment.unix(+obj.getAttribute('timestamp')).toDate()).local();
+                obj.innerHTML = time.fromNow();
+            })
+            Array.from(document.querySelectorAll('#recent_list .recent-timer')).forEach(function(obj) {
+                obj.innerHTML = APP.timeToText(obj.getAttribute('data-time'));
+            })
+
+            let AdvImages = {
+                container: F.id('advantages'),
+                r1: {
+                    div: undefined,
+                    url: undefined
+                },
+                r2: {
+                    div: undefined,
+                    url: undefined
+                },
+                r3: {
+                    div: undefined,
+                    url: undefined
+                },
+
+                init: function() {
+                    let self = this;
+                    self.r1.div = self.container.querySelector('.adv-fast > .advantages-image.wimg');
+                    self.r2.div = self.container.querySelector('.adv-easy > .advantages-image.wimg');
+                    self.r3.div = self.container.querySelector('.adv-profitable > .advantages-image.wimg');
+                    if (self.r1.div) self.r1.url = window.getComputedStyle(self.r1.div, false).backgroundImage.replaceAll('F7931A', '{color}');
+                    if (self.r2.div) self.r2.url = window.getComputedStyle(self.r2.div, false).backgroundImage.replaceAll('F7931A', '{color}');
+                    if (self.r3.div) self.r3.url = window.getComputedStyle(self.r3.div, false).backgroundImage.replaceAll('F7931A', '{color}');
+                },
+
+                change: function(color) {
+                    let self = this;
+                    if (self.r1.div) self.r1.div.style.backgroundImage = self.r1.url.replaceAll('{color}', color);
+                    if (self.r2.div) self.r2.div.style.backgroundImage = self.r2.url.replaceAll('{color}', color);
+                    if (self.r3.div) self.r3.div.style.backgroundImage = self.r3.url.replaceAll('{color}', color);
+                }
+            }
+            AdvImages.init();
+
+            F.bind(document, 'highlightingColor', function(e) {
+                e = e || event;
+                let color = APP.getActiveColor(e.detail.from, e.detail.to, false);
+                AdvImages.change(color);
+            })
+            
+            F.on('faq_wrapper', 'click', 'ol > li > h4', function(e) {
+                let li = this.parentNode;
+                let div = li.querySelector('div.faq-inner');
+                let h = UI.func.round(div.getBoundingClientRect().height, 4);
+                let is = F.hasClass(li, 'active');
+                div.parentNode.style.height = h + 'px';
+                F.remClass(li.parentNode.querySelectorAll('li'), 'active');
+                F.togClass(li, 'active', !is);
+            })
+
+            UI.carousel('index_news', {
+                scale:    1.2,
+                navPrev:  F.id('index_news_prev'),
+                navNext:  F.id('index_news_next'),
+                wrapline: F.id('index_news_line')
+            });
+
+            UI.carousel('index_guides', {
+                maxScrollSlide: 8,
+                navPrev:  F.id('index_guides_prev'),
+                navNext:  F.id('index_guides_next'),
+                wrapline: F.id('index_guides_line')
+            });
+
+        })
+    </script>
+    <template id="cookies_accept">
+        <div class="cookie-content">
+            <p>We use cookies to provide the best experience on our website. By using the FixedFloat service you agree to <a href="/privacy-policy">Privacy Policy</a> and <a href="/terms-of-service">Terms of Service</a>.</p>
+            <button class="btn submit close" type="button">Accept & Close</button>
+        </div>
+    </template>
+    <footer>
+		<div class="wrapper">
+            <div class="foot-wrap">
+        		<div class="foot-outro">
+    				<a href="/" id="foot_logo" class="logo">
+    	                <span class="logo-text-fixed"></span><div class="ico"><span class="logo-arrow-from"></span><span class="logo-arrow-to hl"></span></div><span class="logo-text-float hl"></span>
+    	            </a>
+    	            <div class="foot-soc">
+                        <a rel="noopener noreferrer" target="_blank" class="ico s_tw hoverhl" title="Twitter" href="https://twitter.com/fixedfloat"></a>
+                        <a rel="noopener noreferrer" target="_blank" class="ico s_instagram hoverhl" title="instagram.com" href="https://www.instagram.com/fixedfloat/"></a>
+                        <a rel="noopener noreferrer" target="_blank" class="ico s_tg hoverhl" title="Telegram" href="https://t.me/FixedFloat"></a>
+                        <a rel="noopener noreferrer" target="_blank" class="ico s_reddit hoverhl" title="Reddit" href="https://www.reddit.com/user/FixedFloat/"></a>
+                        <a rel="noopener noreferrer" target="_blank" class="ico s_medium hoverhl" title="medium.com" href="https://medium.com/fixedfloat"></a>
+                        <a rel="noopener noreferrer" target="_blank" class="ico s_bestchange hoverhl" title="bestchange.com" href="https://www.bestchange.com/fixedfloat-exchanger.html"></a>
+                        <a rel="noopener noreferrer" target="_blank" class="ico s_trustpilot hoverhl" title="trustpilot.com" href="https://www.trustpilot.com/review/fixedfloat.com"></a>
+                            	            </div>
+                    <div class="copyright">© 2018–2026 <span>FixedFloat</span>. All rights reserved.</div>
+        		</div>
+                <div class="foot-menu linkhl">
+                    <div class="col">
+                        <h4>FixedFloat</h4>
+                        <ul>
+                            <li><a href="about.html">About</a></li>
+                        
+                            <li><a href="affiliate.html">Affiliate program</a></li>                                                    
+                            <li><a href="api.html">API Terms of Use</a></li>
+                        </ul>
+                    </div>
+                    <div class="col">
+                        <h4>Popular</h4>
+                        <ul>
+                            <li><a href="/blog">Blog</a></li>
+                            <li><a href="/exchange/xmr-to-btc">XMR to BTC</a></li>
+                            <li><a href="/exchange/btc-to-xmr">BTC to XMR</a></li>
+                            <li><a href="/exchange/eth-to-xmr">ETH to XMR</a></li>
+                            <li><a href="/exchange/eth-to-btc">ETH to BTC</a></li>
+                            <li><a href="/exchange/usdttrc-to-usdt">USDT(TRX) to USDT(ETH)</a></li>
+                            <li><a href="/exchange/usdt-to-usdttrc">USDT(ETH) to USDT(TRX)</a></li>
+                        </ul>
+                    </div>
+                    <div class="col">
+                        <h4>Support</h4>
+                        <ul>
+                            <li><a href="/faq">FAQ</a></li>
+                            <li><a href="/support">Support</a></li>
+                            <li><a href="/api">API</a></li>
+                        </ul>
+                    </div>
+        		</div>
+            </div>
+		</div>
+	</footer>
+    <link rel="stylesheet" type="text/css" href="css/svgimgs.min.css">
+	
+</body></html>
