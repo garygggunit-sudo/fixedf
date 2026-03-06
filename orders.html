@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<!-- saved from url=(0025)https://ff.io/user/orders -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	
+	<title>Orders history | FixedFloat</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<meta property="og:image" content="https://ff.io/assets/images/public/ogimage.jpg">
+	<meta property="og:site_name" content="FixedFloat">
+	<link rel="shortcut icon" href="https://ff.io/assets/images/favicon.png">
+	<meta name="title" content="Orders history | FixedFloat">
+	<meta property="og:title" content="Orders history | FixedFloat">
+	<meta property="og:description" content="">
+	<link rel="apple-touch-icon" sizes="57x57" href="images/apple-touch-icon-57x57.png">
+	<link rel="apple-touch-icon" sizes="60x60" href="images/apple-touch-icon-60x60.png">
+	<link rel="apple-touch-icon" sizes="72x72" href="images/apple-touch-icon-72x72.png">
+	<link rel="apple-touch-icon" sizes="76x76" href="images/apple-touch-icon-76x76.png">
+	<link rel="apple-touch-icon" sizes="117x117" href="images/apple-touch-icon-117x117.png">
+	<link rel="apple-touch-icon" sizes="120x120" href="images/apple-touch-icon-120x120.png">
+	<link rel="apple-touch-icon" sizes="144x144" href="images/apple-touch-icon-144x144.png">
+	<link rel="apple-touch-icon" sizes="152x152" href="images/apple-touch-icon-152x152.png">
+	<link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon-180x180.png">
+	<link rel="alternate" hreflang="en" href="https://ff.io/en/">
+	<link rel="alternate" hreflang="es" href="https://ff.io/es/">
+	<link rel="alternate" hreflang="de" href="https://ff.io/de/">
+	<link rel="alternate" hreflang="fr" href="https://ff.io/fr/">
+	<link rel="alternate" hreflang="pt" href="https://ff.io/pt/">
+	<link rel="alternate" hreflang="ru" href="https://ff.io/ru/">
+	<link rel="alternate" hreflang="pl" href="https://ff.io/pl/">
+	<link rel="alternate" hreflang="nl" href="https://ff.io/nl/">
+	<link rel="alternate" hreflang="ua" href="https://ff.io/ua/">
+	<link rel="alternate" hreflang="tr" href="https://ff.io/tr/">
+	<link rel="alternate" hreflang="it" href="https://ff.io/it/">
+	<link rel="alternate" hreflang="cn" href="https://ff.io/cn/">
+	<link rel="alternate" hreflang="ko" href="https://ff.io/ko/">
+	<link rel="alternate" hreflang="ja" href="https://ff.io/ja/">
+	<link rel="alternate" hreflang="x-default" href="https://ff.io/">
+	<link rel="preload" href="/assets/fonts/montserrat/latin/montserrat-v25-latin-300.woff2" as="font" type="font/woff2" crossorigin="">
+	<link rel="preload" href="/assets/fonts/montserrat/latin/montserrat-v25-latin-regular.woff2" as="font" type="font/woff2" crossorigin="">
+	<link rel="preload" href="/assets/fonts/montserrat/latin/montserrat-v25-latin-500.woff2" as="font" type="font/woff2" crossorigin="">
+	<link rel="preload" href="/assets/fonts/montserrat/latin/montserrat-v25-latin-600.woff2" as="font" type="font/woff2" crossorigin="">
+	<link rel="preload" href="/assets/fonts/montserrat/latin/montserrat-v25-latin-700.woff2" as="font" type="font/woff2" crossorigin="">
+	<link rel="preload" href="/assets/fonts/fficons/fficons.woff2?101128" as="font" type="font/woff2" crossorigin="">
+	<style type="text/css">
+		@font-face {
+			font-family: 'Icons';
+			font-display: block;
+			src: url("fonts/fficons.woff2") format("woff2"), 
+			     url("fonts/fficons.woff") format("woff"), 
+			     url("fonts/fficons.ttf") format("truetype");
+		}
+	</style>
+	<link rel="stylesheet" type="text/css" href="css/min.css">
+	<link rel="stylesheet" type="text/css" href="css/table.min.css">
+	<script type="text/javascript" src="js/min.js"></script>
+    <script type="text/javascript" src="js/matter.min.js" defer=""></script>
+    <script type="text/javascript" src="js/exchange.min.js"></script>
+	<script type="text/javascript" src="js/moment.min.js" defer=""></script>
+	<script type="text/javascript" src="js/ztable.min.js"></script>
+	<script type="text/javascript" src="js/jsqr.js" defer=""></script>
+	<script type="text/javascript" src="js/webln.min.js" defer=""></script>
+	<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+	<script type="text/javascript" src="firebase-orders-integration.js"></script>
+	<script async="" src="https://www.googletagmanager.com/gtag/js?id=UA-125458753-1"></script>
+	<script>
+		window.dataLayer = window.dataLayer || [];
+		function gtag(){dataLayer.push(arguments);}
+		gtag('js', new Date());
+		gtag('config', 'UA-125458753-1');
+	</script>
+<script id="freshchat-js-sdk" async="" src="./Orders history _ FixedFloat_files/widget.js.download"></script><link href="./Orders history _ FixedFloat_files/widget.css" rel="stylesheet"></head>
+<body class="darkbg">
+	<script type="text/javascript">
+		let localTheme = localStorage.getItem('theme');
+		let currTheme  = localTheme ? localTheme : "dark";
+		window.themeLight = currTheme == 'light' ? true : false;
+		document.body.className += (document.body.className ? ' ' : '') + currTheme+'bg';
+	</script>
+	<script type="text/javascript">
+		function initFreshChat() {
+			let restoreId = '';
+			window.fcWidget.init({
+				token: "15d5f180-cf0e-4bcc-8165-c25e4879bab4",
+				host:  "https://wchat.freshchat.com",
+				locale: "en",
+				externalId: "user_117606",
+				restoreId: restoreId ? restoreId : null,
+				config: {
+			    	hideFAQ: true,
+			    	agent: {
+				        hideName: true,
+				        hidePic:  true,
+				        hideBio:  false,
+			    	},
+				},
+			});
+			window.fcWidget.user.get(function(resp) {
+				window.fcWidget.user.setFirstName("Client #23406776");
+
+				let status = resp && resp.status,
+					data   = resp && resp.data;
+				if (status !== 200) {
+					window.fcWidget.on('user:created', function(resp) {
+						let status = resp && resp.status,
+							data   = resp && resp.data;
+						if (status === 200 || !restoreId) {
+							setRestoreId(data.restoreId)
+						}
+					});
+				} else if (data.restoreId && !restoreId) {
+					setRestoreId(data.restoreId)
+				}
+			});
+			function setRestoreId(restoreId) {
+				if (!restoreId) return;
+				APP.api('userSetChatRestoreId', {restoreId: restoreId})
+					.then(function(msg) {}).catch(function(msg) {})
+			}
+
+			document.dispatchEvent(new Event("freshchatStart"));
+		}
+
+		function initialize(i,t) {
+			var e;
+			i.getElementById(t) ? initFreshChat() : (
+				(e = i.createElement("script")).id = t,
+				e.async = !0,
+				e.src = "https://wchat.freshchat.com/js/widget.js",
+				e.onload = initFreshChat,
+				i.head.appendChild(e)
+			)
+		}
+		function initiateCall() {
+			initialize(document,"freshchat-js-sdk")
+		}
+		window.addEventListener ? window.addEventListener("load",initiateCall,!1) : window.attachEvent("load",initiateCall,!1);
+	</script>
+	<style id="highlighting_style"></style>
+	<header id="header" class="ontop">
+		<div class="wrapper">
+			<div class="left-menu-wrap" id="left_menu_wrap">
+				<div id="left_menu_btn">
+					<div><span></span><span></span><span></span></div>
+				</div>
+				<nav class="left-menu" id="left_menu">
+					<div class="theme-switch-wrap">
+						<label class="theme-switch">
+							<input type="checkbox" name="themelight" id="themelight_switch_mobile">
+							<span><i class="ico"></i></span>
+						</label>
+					</div>
+					<section>
+						<ul id="left_menu_content" class="menu linkhl">
+							<li class="menu-head"><span>Account</span></li>
+													<li><a href="/user/signin">Sign in</a></li>
+							<li><a href="/user/signup">Sign up</a></li>
+													<li class="menu-head"><span>FixedFloat</span></li>
+							<li><a href="about.html">About</a></li>
+							<li><a href="blog.html">Blog</a></li>
+							<li><a href="faq.html">FAQ</a></li>
+							<li><a href="api.html">API</a></li>
+							<li><a href="support.html">Support</a></li>
+													<li><a href="affiliate.html">Affiliate program</a></li>
+						                            <li><a href="brand.html">Our brand</a></li>
+							<li class="menu-head"><span>Rules</span></li>
+                            <li><a href="terms-of-service.html">Terms of Service</a></li>
+                            <li><a href="privacy-policy.html">Privacy Policy</a></li>
+                            <li><a href="affiliate-program-terms.html">Affiliate Program Terms</a></li>
+                            <li><a href="api-terms.html">API Terms of Use</a></li>
+						</ul>
+					</section>
+				</nav>
+			</div>
+			<nav>
+								<a href="index.html" id="logo" class="logo">
+					<span class="logo-text-fixed" id="logo_text_from"></span><div class="ico"><span class="logo-arrow-from" id="logo_arrow_from"></span><span class="logo-arrow-to" id="logo_arrow_to"></span></div><span class="logo-text-float" id="logo_text_to"></span>
+				</a>
+				<div class="nav-right">
+					<ul class="nav menu hoverhl">
+						<li><a href="about.html">About</a></li>
+						<li><a href="blog.html">Blog</a></li>
+						<li><a href="faq.html">FAQ</a></li>
+						<li><a href="api.html">API</a></li>
+						<li><a href="support.html">Support</a></li>
+					</ul>
+									<div class="loc hoverhl">
+						<a class="menu-focus-btn" tabindex="0"><div class="ui-select-value"><i class="loc-img loc-en"></i></div></a>
+						<div class="menu-focus-opened">
+							<ul class="hoverhl" id="loc_menu_wrap" style="padding-right: 0px; width: calc(100% + 0px);">
+																	<li><a href="https://ff.io/en/user/orders"><i class="loc-img loc-en"></i><span>English</span></a></li>
+																	<li><a href="https://ff.io/es/user/orders"><i class="loc-img loc-es"></i><span>Español</span></a></li>
+																	<li><a href="https://ff.io/de/user/orders"><i class="loc-img loc-de"></i><span>Deutsch</span></a></li>
+																	<li><a href="https://ff.io/fr/user/orders"><i class="loc-img loc-fr"></i><span>Français</span></a></li>
+																	<li><a href="https://ff.io/pt/user/orders"><i class="loc-img loc-pt"></i><span>Português</span></a></li>
+																	<li><a href="https://ff.io/ru/user/orders"><i class="loc-img loc-ru"></i><span>Русский</span></a></li>
+																	<li><a href="https://ff.io/pl/user/orders"><i class="loc-img loc-pl"></i><span>Polski</span></a></li>
+																	<li><a href="https://ff.io/nl/user/orders"><i class="loc-img loc-nl"></i><span>Nederlands</span></a></li>
+																	<li><a href="https://ff.io/ua/user/orders"><i class="loc-img loc-ua"></i><span>Украïнська</span></a></li>
+																	<li><a href="https://ff.io/tr/user/orders"><i class="loc-img loc-tr"></i><span>Türkçe</span></a></li>
+																	<li><a href="https://ff.io/it/user/orders"><i class="loc-img loc-it"></i><span>Italiano</span></a></li>
+																	<li><a href="https://ff.io/cn/user/orders"><i class="loc-img loc-cn"></i><span>中文</span></a></li>
+																	<li><a href="https://ff.io/ko/user/orders"><i class="loc-img loc-ko"></i><span>한국어</span></a></li>
+																	<li><a href="https://ff.io/ja/user/orders"><i class="loc-img loc-ja"></i><span>日本の</span></a></li>
+															</ul>
+						<div class="ui-select-scroll-wrap hidden" data-height="100"><div class="ui-select-scroll" style="top: 0px; height: 100%;"></div></div></div>
+						<div class="shadow-body" tabindex="0"></div>
+					</div>
+					<div class="theme-switch-wrap">
+						<label class="theme-switch">
+							<input type="checkbox" name="themelight" id="themelight_switch">
+							<span><i class="ico"></i></span>
+						</label>
+						<script type="text/javascript">
+						    if (window.themeLight) {
+						    	document.getElementById('themelight_switch').checked = true;
+						    	document.getElementById('themelight_switch_mobile').checked = true;
+						    }
+						</script>
+					</div>
+													<div class="nav userbar hoverhl">
+						<a class="menu-focus-btn" tabindex="0">Account</a>
+						<ul class="menu-focus-opened hoverhl">
+									<li><a href="https://ff.io/user/profile"><i class="ico profile"></i><span>Personal data</span></a></li>
+		<li><a href="https://ff.io/user/orders"><i class="ico history"></i><span>Orders history</span></a></li>
+		<li><a href="https://ff.io/user/addressbook"><i class="ico addressbook"></i><span>Address book</span></a></li>
+		<li><a href="https://ff.io/user/affiliate"><i class="ico affiliate"></i><span>Affiliate program</span></a></li>
+		<li><a href="https://ff.io/user/payouts"><i class="ico payout"></i><span>Payouts</span></a></li>
+		<li><a href="https://ff.io/user/apikey"><i class="ico apikey"></i><span>API management</span></a></li>
+		<li><a href="https://ff.io/user/signout" class="signout" data-confirm="Are you sure?"><i class="ico signout"></i><span>Sign out</span></a></li>						</ul>
+					</div>
+								</div>
+			</nav>
+			<div class="shadow-body"></div>
+		</div>
+	</header>
+		<main>
+		<div class="wrapper user-section">
+			<aside class="stickybar"><ul class="sidemenu">		<li><a href="https://ff.io/user/profile"><i class="ico profile"></i><span>Personal data</span></a></li>
+		<li><a href="https://ff.io/user/orders" class="active"><i class="ico history"></i><span>Orders history</span></a></li>
+		<li><a href="https://ff.io/user/addressbook"><i class="ico addressbook"></i><span>Address book</span></a></li>
+		<li><a href="https://ff.io/user/affiliate"><i class="ico affiliate"></i><span>Affiliate program</span></a></li>
+		<li><a href="https://ff.io/user/payouts"><i class="ico payout"></i><span>Payouts</span></a></li>
+		<li><a href="https://ff.io/user/apikey"><i class="ico apikey"></i><span>API management</span></a></li>
+		<li><a href="https://ff.io/user/signout" class="signout" data-confirm="Are you sure?"><i class="ico signout"></i><span>Sign out</span></a></li></ul></aside>			<section class="content user-content">
+				<h2>Active orders</h2>
+				<section class="tablecontent">
+					<div class="ztp-wrap">
+						<div class="ztp-length"></div>
+						<div class="ztp-outer">
+							<div class="ztp-scroll">
+								<table class="ztp" id="orders_active">
+									<caption></caption>
+									<thead>
+										<tr>
+											<td class=""><div class="mh">Order&nbsp;ID<span class="ico"></span></div></td>
+											<td class="sorting min" data-type="reg"><div class="mh">Time<span class="ico"></span></div></td>
+											<td class=""><div class="mh">Send<span class="ico"></span></div></td>
+											<td class=""><div class="mh">Receive<span class="ico"></span></div></td>
+											<td class=""><div class="mh">Status<span class="ico"></span></div></td>
+										</tr>
+									</thead>
+									<tbody></tbody>
+								</table>
+								<table class="ztp-template none">
+									<tbody>
+										<tr class="ztp-tmpl" id="orders_active_tmpl">
+											<td><div class="ztp-c mh" data-type="id">{id}</div></td>
+											<td><div class="ztp-c mh" data-type="reg">{reg_t}</div></td>
+											<td><div class="ztp-c mh" data-type="fromQty"><span class="ib-middle coin-img svgcoin {fromCurrency_min}"></span> <span class="ib-middle">{fromQty} {fromCurrency}</span></div></td>
+											<td><div class="ztp-c mh" data-type="toQty"><span class="ib-middle coin-img svgcoin {toCurrency_min}"></span> <span class="ib-middle">{toQty} {toCurrency}</span></div></td>
+											<td><div class="ztp-c mh" data-type="status" data-value="{status}">{status_valname}</div></td>
+										</tr>
+										<tr class="ztp-tmpl" id="orders_active_tmpl_more">
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+						<div class="ztp-bottom clrfix">
+							<div class="ztp-countshow">
+								<span class="ztp-countshow-before">Show</span>
+								<span class="select-wrap">
+									<select id="orders_active_countshow">
+										<option selected="">10</option>
+										<option>25</option>
+										<option>50</option>
+										<option>75</option>
+										<option>100</option>
+										<option>125</option>
+										<option>150</option>
+									</select>
+									<i class="select-arrow"></i>
+								</span>
+								<span class="ztp-countshow-after">entries</span>
+							</div>
+							<ul class="ztp-paginate clrfix" id="orders_active_pages" data-pages=""><li><button class="ztp-page-prev" disabled="">‹</button></li><li><button class="ztp-page-number active">1</button></li><li><button class="ztp-page-next" disabled="">›</button></li></ul>
+						</div>
+					</div>
+				</section>
+				<h2>Сompleted orders</h2>
+				<section class="tablecontent">
+					<div class="ztp-wrap">
+						<div class="ztp-length"></div>
+						<div class="ztp-outer">
+							<div class="ztp-scroll">
+								<table class="ztp" id="orders">
+									<caption></caption>
+									<thead>
+										<tr>
+											<td class="sorting min" data-type="reg"><div class="mh">Date\<br>Order&nbsp;ID<span class="ico"></span></div></td>
+											<td class=""><div class="mh">Send<span class="ico"></span></div></td>
+											<td class=""><div class="mh">Receive<span class="ico"></span></div></td>
+											<td class=""><div class="mh">Destination address<span class="ico"></span></div></td>
+										</tr>
+									</thead>
+									<tbody></tbody>
+								</table>
+								<table class="ztp-template none">
+									<tbody>
+										<tr class="ztp-tmpl" id="orders_tmpl">
+											<td><div class="ztp-c mh" data-type="reg">{reg_d}<br><a href="https://ff.io/order/%7Bid%7D" target="_blank">{id}</a></div></td>
+											<td><div class="ztp-c mh" data-type="fromQty"><span class="ib-middle coin-img svgcoin {fromCurrency_min}"></span> <span class="ib-middle">{fromQty} {fromCoin}{#fromShowNetwork}<sup>{fromNetwork}</sup>{\fromShowNetwork}</span></div></td>
+											<td><div class="ztp-c mh" data-type="toQty"><span class="ib-middle coin-img svgcoin {toCurrency_min}"></span> <span class="ib-middle">{toQty} {toCoin}{#toShowNetwork}<sup>{toNetwork}</sup>{\toShowNetwork}</span></div></td>
+											<td><div class="ztp-c mh breakall" data-type="toAddress">{toAddress}</div></td>
+										</tr>
+										<tr class="ztp-tmpl" id="orders_tmpl_more">
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+						<div class="ztp-bottom clrfix">
+							<div class="ztp-countshow">
+								<span class="ztp-countshow-before">Show</span>
+								<span class="select-wrap">
+									<select id="orders_countshow">
+										<option selected="">10</option>
+										<option>25</option>
+										<option>50</option>
+										<option>75</option>
+										<option>100</option>
+										<option>125</option>
+										<option>150</option>
+									</select>
+									<i class="select-arrow"></i>
+								</span>
+								<span class="ztp-countshow-after">entries</span>
+							</div>
+							<ul class="ztp-paginate clrfix" id="orders_pages" data-pages=""><li><button class="ztp-page-prev" disabled="">‹</button></li><li><button class="ztp-page-number active">1</button></li><li><button class="ztp-page-next" disabled="">›</button></li></ul>
+						</div>
+					</div>
+				</section>
+			</section>
+		</div>
+	</main>
+	<script type="text/javascript">
+		document.addEventListener("DOMContentLoaded", function() {
+		    let F = UI.func;
+		    F.bind(document.querySelectorAll('.input-copy'), 'click', function() {
+		    	this.focus();
+		    })
+
+		    let ui_orders_active = UI.ztable('orders_active', {
+				ajaxFunc: {
+					'load': 'userOrders',
+				},
+				filter: {
+					'status': [0,1,2,3,7]
+				},
+				typeSelect: {
+					status: {
+						0: 'New',
+						1: 'Pending',
+						2: 'Exchange',
+						3: 'Withdraw',
+						7: 'Emergency',
+					}
+				},
+				onRowInit: function(row) {
+					let reg = moment(moment.utc(row.reg).toDate()).local();
+					row.reg_d = reg.format('L');
+					row.reg_t = reg.format('HH:mm');
+					row.fromCurrency_min = row.fromCurrency.toLowerCase();
+					row.toCurrency_min = row.toCurrency.toLowerCase();
+					row.fromQty = F.fixNumber(+row.fromQty);
+
+					row.fromShowNetwork = row.fromCoin != row.fromNetwork;
+					row.toShowNetwork = row.toCoin != row.toNetwork;
+				},
+			});
+
+		    let ui_orders = UI.ztable('orders', {
+				ajaxFunc: {
+					'load': 'userOrders',
+				},
+				filter: {
+					'status': [4]
+				},
+				onRowInit: function(row) {
+					let reg = moment(moment.utc(row.reg).toDate()).local();
+					row.reg_d = reg.format('L');
+					row.reg_t = reg.format('HH:mm');
+					row.fromCurrency_min = row.fromCurrency.toLowerCase();
+					row.toCurrency_min = row.toCurrency.toLowerCase();
+					row.fromQty = F.fixNumber(+row.fromQty);
+					row.toQty = F.fixNumber(+row.toQty);
+
+					row.fromShowNetwork = row.fromCoin != row.fromNetwork;
+					row.toShowNetwork = row.toCoin != row.toNetwork;
+				},
+			});
+		})
+	</script>
+    <footer>
+		<div class="wrapper">
+            <div class="foot-wrap">
+        		<div class="foot-outro">
+    				<a href="https://ff.io/" id="foot_logo" class="logo">
+    	                <span class="logo-text-fixed"></span><div class="ico"><span class="logo-arrow-from"></span><span class="logo-arrow-to hl"></span></div><span class="logo-text-float hl"></span>
+    	            </a>
+    	            <div class="foot-soc">
+                        <a rel="noopener noreferrer" target="_blank" class="ico s_tw hoverhl" title="Twitter" href="https://twitter.com/fixedfloat"></a>
+                        <a rel="noopener noreferrer" target="_blank" class="ico s_instagram hoverhl" title="instagram.com" href="https://www.instagram.com/fixedfloat/"></a>
+                        <a rel="noopener noreferrer" target="_blank" class="ico s_tg hoverhl" title="Telegram" href="https://t.me/FixedFloat"></a>
+                        <a rel="noopener noreferrer" target="_blank" class="ico s_reddit hoverhl" title="Reddit" href="https://www.reddit.com/user/FixedFloat/"></a>
+                        <a rel="noopener noreferrer" target="_blank" class="ico s_medium hoverhl" title="medium.com" href="https://medium.com/fixedfloat"></a>
+                        <a rel="noopener noreferrer" target="_blank" class="ico s_bestchange hoverhl" title="bestchange.com" href="https://www.bestchange.com/fixedfloat-exchanger.html"></a>
+                        <a rel="noopener noreferrer" target="_blank" class="ico s_trustpilot hoverhl" title="trustpilot.com" href="https://www.trustpilot.com/review/fixedfloat.com"></a>
+                            	            </div>
+                    <div class="copyright">©&nbsp;2018–2026&nbsp;<span>FixedFloat</span>.&nbsp;All rights reserved.</div>
+        		</div>
+                <div class="foot-menu linkhl">
+                    <div class="col">
+                        <h4>FixedFloat</h4>
+                        <ul>
+                            <li><a href="https://ff.io/about">About</a></li>
+                            <li><a href="https://ff.io/brand">Our brand</a></li>
+                            <li><a href="https://ff.io/affiliate">Affiliate program</a></li>
+                            <li><a href="https://ff.io/terms-of-service">Terms of Service</a></li>
+                            <li><a href="https://ff.io/privacy-policy">Privacy Policy</a></li>
+                            <li><a href="https://ff.io/affiliate-program-terms">Affiliate Program Terms</a></li>
+                            <li><a href="https://ff.io/api-terms">API Terms of Use</a></li>
+                        </ul>
+                    </div>
+                    <div class="col">
+                        <h4>Popular</h4>
+                        <ul>
+                            <li><a href="https://ff.io/blog">Blog</a></li>
+                            <li><a href="https://ff.io/exchange/xmr-to-btc">XMR to BTC</a></li>
+                            <li><a href="https://ff.io/exchange/btc-to-xmr">BTC to XMR</a></li>
+                            <li><a href="https://ff.io/exchange/eth-to-xmr">ETH to XMR</a></li>
+                            <li><a href="https://ff.io/exchange/eth-to-btc">ETH to BTC</a></li>
+                            <li><a href="https://ff.io/exchange/usdttrc-to-usdt">USDT(TRX) to USDT(ETH)</a></li>
+                            <li><a href="https://ff.io/exchange/usdt-to-usdttrc">USDT(ETH) to USDT(TRX)</a></li>
+                        </ul>
+                    </div>
+                    <div class="col">
+                        <h4>Support</h4>
+                        <ul>
+                            <li><a href="https://ff.io/faq">FAQ</a></li>
+                            <li><a href="https://ff.io/support">Support</a></li>
+                            <li><a href="https://ff.io/api">API</a></li>
+                        </ul>
+                    </div>
+        		</div>
+            </div>
+		</div>
+	</footer>
+    <link rel="stylesheet" type="text/css" href="./Orders history _ FixedFloat_files/svgimgs.min.css">
+
+<div id="fc_frame" class="fc-widget-small" style="bottom: 15px; right: 15px;"><iframe id="fc_widget" name="fc_widget" title="Chat" frameborder="0" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" src="./Orders history _ FixedFloat_files/saved_resource.html"></iframe></div></body></html>
